@@ -1,5 +1,10 @@
 .App {
   text-align: center;
+  background-image: linear-gradient(to right,#ee9ca7 0%,#ffdde1 100%) ,url(./Assets/Social\ Media-2.PNG);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: color-burn;
+  min-height: 100vh;
 }
 
 .App-logo {
@@ -14,7 +19,6 @@
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

@@ -1,0 +1,50 @@
+@font-face {
+    font-family: lobsterRegular;
+    src: url(../../Assets/Fonts/Lobster-Regular.ttf);
+}
+
+@font-face {
+    font-family: CaveatBold;
+    src: url(../../Assets/Fonts/Caveat-Bold.ttf);
+}
+
+.wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.cardWrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.cardHeader{
+    background-image: linear-gradient(to right,#E0EAFC 0%,#CFDEF3 100%);
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.loginBtn{
+    background-color: white !important;
+    border: 1px solid #0d6efd;
+}
+
+.loginBtn:hover{
+    background-image: linear-gradient(to right,#E0EAFC 0%,#CFDEF3 100%);
+}
+
+.lobsterReg{
+    font-family: lobsterRegular;
+}
+
+.caveatBold{
+    font-family: CaveatBold;
+}
+
