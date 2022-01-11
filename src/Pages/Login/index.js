@@ -1,8 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, Button, Form } from 'react-bootstrap'
+import { useDispatch } from 'react-redux';
+import { loginAction } from '../../Store/actions/loginActions';
 import './index.css'
 
 function Login() {
+
+    const dispatch = useDispatch();
+
+    const [ userName, setUserName ] = useState('');
+    const [ password, setPassword ] = useState('');
+
+    const onLogin = ()=>{
+        dispatch(loginAction(userName, password, '', ({credentialsVerified, status})=>{
+            if(status === 200 && credentialsVerified === "OK") alert('Login Success !!');
+            if(status === 400) alert('Login Failed !!');
+        }))
+    }
+
     return (
         <div className='wrapper'>
             <div className='cardWrapper'>
@@ -13,15 +28,25 @@ function Login() {
                     <Card.Body>
                         <Form>
                             <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label className='d-flex justify-content-start caveatBold'>Email address</Form.Label>
-                                <Form.Control type="email" placeholder="Enter email" />
+                                <Form.Label className='d-flex justify-content-start caveatBold'>User Name</Form.Label>
+                                <Form.Control 
+                                    type="text" 
+                                    placeholder="Enter your user name" 
+                                    value={userName}
+                                    onChange={(e)=>setUserName(e.target.value)}
+                                />
                             </Form.Group>
 
                             <Form.Group className="mb-3" controlId="formBasicPassword">
                                 <Form.Label className='d-flex justify-content-start caveatBold'>Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password" />
+                                <Form.Control 
+                                    type="password" 
+                                    placeholder="Password" 
+                                    value={password}
+                                    onChange={(e)=>setPassword(e.target.value)}
+                                />
                             </Form.Group>
-                            <Button className='caveatBold loginBtn' style={{color: 'black'}}>
+                            <Button onClick={onLogin} className='caveatBold loginBtn' style={{color: 'black'}}>
                                 Login
                             </Button>
                         </Form>
