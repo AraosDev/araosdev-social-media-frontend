@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { Button, Card, Form } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { Loader } from '../../Common/DataTransitionHandlers';
+import FormHeader from '../../Common/FormHeader';
+import { createAccountAction } from '../../Store/actions/newAccountActions';
 import '../Login/index.css';
+import AccountCreated from './AccountCreated';
+import CreateAccount from './CreateAccount';
+import ErrorView from './ErrorView';
 
 function NewAccount() {
+
+    const dispatch = useDispatch();
 
     const [ userName, setUserName ] = useState('');
     const [ email, setEmail ] = useState('');
@@ -10,92 +18,88 @@ function NewAccount() {
     const [ confirmpassword, setConfirmPassword ] = useState('');
     const [ phnNumber, setPhnNumber ] = useState(null);
     const [ accountType, setAccountType ] = useState(null);
+    const [ pwdError, setPwdError ] = useState(false);
+    const [ view, setView ] = useState("CREATE_ACCOUNT");
+    const [ errorType, setErrorType ] = useState("");
 
-    return (
-        <div className='wrapper'>
-            <div className='cardWrapper'>
-                <h2 className='caveatBold'>AraosDev</h2>
-                <h2 className='caveatBold'>Social Media Web App</h2>
-                <hr className='my-2' style={{border: '1px solid', width: '100%'}} />
-                <Card className='m-4'>
-                <Card.Header as="h5" className='cardHeader caveatBold'>Create your account</Card.Header>
-                    <Card.Body>
-                        <Form className='form-grp-style'>
-                            <Form.Group className="mb-3 d-flex justify-content-between" controlId="formBasicEmail">
-                                <Form.Label style={{ flexDirection: 'column' }} className='mx-3 d-flex justify-content-start caveatBold'>
-                                    User Name
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter your user name"
-                                        value={userName}
-                                        onChange={(e) => setUserName(e.target.value)}
-                                    />
-                                </Form.Label>
-                                
-                                <Form.Label style={{flexDirection: 'column'}} className=' mx-3 d-flex justify-content-start caveatBold'>
-                                    Email
-                                    <Form.Control 
-                                        type="email" 
-                                        placeholder="Enter your email" 
-                                        value={email}
-                                        onChange={(e)=>setEmail(e.target.value)}
-                                    />
-                                </Form.Label>
-                            </Form.Group>
+    const onCreateAccount = ()=>{
+        if(password !== confirmpassword) {
+            setPwdError(true);
+            return;
+        }
+        else{
+            const req = {
+                "username": userName,
+                "password": password,
+                "email": email,
+                "phonenumber": phnNumber
+            }
+            dispatch(createAccountAction( req, '', (loaderStatus,{status, updated, message=''})=>{
+                if(status === "LOADING" && updated === "LOADING") setView(status);
 
-                            <Form.Group className="mb-3 d-flex justify-content-between" controlId="formBasicEmail">
-                                <Form.Label style={{flexDirection: 'column'}} className=' mx-3 d-flex justify-content-start caveatBold'>
-                                    Phone Number
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter your Phone Number" 
-                                        value={phnNumber}
-                                        onInput={(e)=>setPhnNumber(e.target.value.replace(/\D/,''))}
-                                    />
-                                </Form.Label>
-                                <Form.Label style={{flexDirection: 'column'}} className=' mx-3 d-flex justify-content-start caveatBold'>
-                                    Account Type
-                                    <Form.Select 
-                                        value={accountType}
-                                        onInput={(e)=>setAccountType(e.target.value)}
-                                    >
-                                        <option disabled>Please select account type</option>
-                                        <option>Private</option>
-                                        <option>Public</option>
-                                    </Form.Select>
-                                </Form.Label>
-                            </Form.Group>
+                if(status === 400 && updated === "FAILED" && loaderStatus==="ERROR"){
+                    setErrorType(message.toUpperCase());
+                    setView("ERROR_VIEW");
+                }
+                if(status === 200 && updated === "OK" && loaderStatus==="LOADED"){
+                    setView("ACCOUNT_CREATED");
+                }
+            }))
+        }
+    }
 
-                            <Form.Group className="mb-3 d-flex justify-content-between" controlId="formBasicPassword">
-                                <Form.Label style={{flexDirection: 'column'}} className='mx-3 d-flex justify-content-start caveatBold'>
-                                    Password
-                                    <Form.Control 
-                                        type="password" 
-                                        placeholder="Type your Password" 
-                                        value={password}
-                                        onChange={(e)=>setPassword(e.target.value)}
-                                    />
-                                </Form.Label>
-                                <Form.Label style={{flexDirection: 'column'}} className='mx-3 d-flex justify-content-start caveatBold'>
-                                    Confirm Password
-                                    <Form.Control 
-                                        type="password" 
-                                        placeholder="Confirm your password" 
-                                        value={confirmpassword}
-                                        onChange={(e)=>setConfirmPassword(e.target.value)}
-                                    />
-                                </Form.Label>
-                            </Form.Group>
+    switch (view) {
 
-                            <Button className='caveatBold loginBtn' style={{color: 'black'}}>
-                                Create Account
-                            </Button>
-                        </Form>
-                    </Card.Body>
-                </Card>
-            </div>
-        </div>
-    )
+        case "CREATE_ACCOUNT":{
+            return (
+                <CreateAccount
+                    userName={userName}
+                    setUserName={setUserName}
+                    password={password}
+                    setPassword={setPassword}
+                    email={email}
+                    setEmail={setEmail}
+                    confirmpassword={confirmpassword}
+                    setConfirmPassword={setConfirmPassword}
+                    phnNumber={phnNumber}
+                    setPhnNumber={setPhnNumber}
+                    accountType={accountType} 
+                    setAccountType={setAccountType}
+                    pwdError={pwdError}
+                    onCreateAccount={onCreateAccount}
+                />
+            )
+        }
+
+        case "ERROR_VIEW": {
+            return(
+                <ErrorView 
+                    errorType={errorType}
+                    setView={setView}
+                />
+            )
+        }
+
+        case "ACCOUNT_CREATED": {
+            return(
+                <AccountCreated />
+            )
+        }
+
+        case "LOADING": {
+            return (
+                <div className='wrapper'>
+                    <div className='cardWrapper'>
+                        <FormHeader />
+                        <Loader />
+                    </div>
+                </div>
+            )
+        }
+
+        default:
+            break;
+    }
 }
 
 export default NewAccount

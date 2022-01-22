@@ -6,5 +6,6 @@ const returnApiConfig = (product='', property='')=>{
 }
 
 export const urls = {
-    getLogin: (property)=>returnApiConfig("LOGIN", property)
+    getLogin: (property)=>returnApiConfig("LOGIN", property),
+    getCreateAccount: (property)=>returnApiConfig("CREATE_ACCOUNT", property)
 }
