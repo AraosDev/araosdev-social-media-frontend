@@ -13,6 +13,11 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-image: linear-gradient(to right,#ee9ca7 0%,#ffdde1 100%) ,url(../../Assets/Social\ Media-2.PNG);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: color-burn;
+    min-height: 100vh;
 }
 
 .cardWrapper{
@@ -46,5 +51,11 @@
 
 .caveatBold{
     font-family: CaveatBold;
+}
+
+.form-grp-style{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
