@@ -1,4 +1,4 @@
 export const apiConfig = {
-    "LOGIN": "http://localhost:5000/araosdevsm/login",
-    "CREATE_ACCOUNT": "http://localhost:5000/araosdevsm/createaccount"
+    "LOGIN": "https://araosdev-social-media.herokuapp.com/araosdevsm/login",
+    "CREATE_ACCOUNT": "https://araosdev-social-media.herokuapp.com/araosdevsm/createaccount"
 }
