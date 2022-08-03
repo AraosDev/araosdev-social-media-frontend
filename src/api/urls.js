@@ -7,5 +7,6 @@ const returnApiConfig = (product='', property='')=>{
 
 export const urls = {
     getLogin: (property)=>returnApiConfig("LOGIN", property),
-    getCreateAccount: (property)=>returnApiConfig("CREATE_ACCOUNT", property)
+    getCreateAccount: (property)=>returnApiConfig("CREATE_ACCOUNT", property),
+    getTimelineImg: (property)=>returnApiConfig("GET_TIMELINE_IMG", property),
 }

@@ -15,6 +15,8 @@ export const loginAction = (username, password, property='', callback)=>{
             const { status, credentialsVerified, details={} } = res.data;
             if(status === 200 && credentialsVerified === "OK"){
                 dispatch(loginState({...details, credentialsVerified}));
+                const userInfo = JSON.stringify({...details, credentialsVerified})
+                localStorage.setItem('userInfo', userInfo);
                 if(callback) callback({...details, credentialsVerified, status});
             }
             else{

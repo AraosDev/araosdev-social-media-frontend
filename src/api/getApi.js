@@ -10,3 +10,8 @@ export const getCreateAccountApi = (property, req)=>{
     const url = urls["getCreateAccount"](property);
     return axios.post(url, req);
 }
+
+export const getTimelineImgApi = (property)=>{
+    const url = urls["getTimelineImg"](property);
+    return axios.get(url);
+}

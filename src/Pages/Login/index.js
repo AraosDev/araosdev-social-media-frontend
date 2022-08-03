@@ -1,20 +1,23 @@
 import React, { useState } from 'react'
 import { Card, Button, Form } from 'react-bootstrap'
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginAction } from '../../Store/actions/loginActions';
 import './index.css'
 
 function Login() {
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [ userName, setUserName ] = useState('');
     const [ password, setPassword ] = useState('');
 
     const onLogin = ()=>{
         dispatch(loginAction(userName, password, '', ({credentialsVerified, status})=>{
-            if(status === 200 && credentialsVerified === "OK") alert('Login Success !!');
+            if(status === 200 && credentialsVerified === "OK") {
+                navigate('/timeline', { replace: true })
+            }
             if(status === 400) alert('Login Failed !!');
         }))
     }

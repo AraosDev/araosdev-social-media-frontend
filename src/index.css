@@ -5,6 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* background-color: #4b4c72 !important; */
+  background-color: rgb(250, 250, 250) !important;
 }
 
 code {
@@ -19,4 +21,12 @@ code {
 
 .caveatBold{
   font-family: CaveatBold;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
 }

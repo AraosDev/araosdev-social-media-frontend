@@ -9,14 +9,17 @@ const loginReducer = (state = initialState, action)=>{
 
         case "STORE_LOGGED_USER_DETAILS":{
             newState.loggedInUserDetails = action.payload;
+            break;
         }
 
         case "STORE_NEW_ACCOUNT_STATE":{
             newState.newAccountState = action.payload;
+            break;
         }
 
         default:{
             newState = {...state}
+            break;
         }
     }
 
