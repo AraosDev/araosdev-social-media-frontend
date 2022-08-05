@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -7,11 +7,16 @@ import { Loader } from "../../Common/DataTransitionHandlers";
 import Card from "react-bootstrap/Card";
 import {
   getTimeLineImagesAction,
+  updateImgCommentAction,
   updateLikeCountAction,
 } from "../../Store/actions/timelineActions";
 import ProfileIcon from "../../Common/ProfileIcon";
 import { BsHeart, BsFillHeartFill, BsChat } from "react-icons/bs";
 import { didCurrentUserLiked } from "./HelperFns";
+import ListGroup from "react-bootstrap/ListGroup";
+import Form from "react-bootstrap/Form";
+import { currentUser, unixTimeToReadableFormat } from "../../Common/helperFns";
+import Badge from "react-bootstrap/Badge";
 
 const StyledTimelineBody = styled.div`
   max-height: calc(100vh - 85px);
@@ -24,6 +29,27 @@ const StyledTimelineBody = styled.div`
     .loader-element {
       height: calc(100vh - 85px);
     }
+    .list-grp-custom-cls {
+      border: 1px solid rgba(0, 0, 0, 0.125);
+      border-radius: 5px;
+      background-color: white;
+    }
+    .form-control {
+      border-bottom: 1px solid #ced4da !important;
+      border: 0px;
+      border-radius: 0px !important;
+    }
+    .form-control:focus {
+      box-shadow: 0 1px rgb(204 204 255);
+      border-bottom: 1px solid rgb(204, 204, 255) !important;
+    }
+    .profile-comment {
+      flex: 1;
+    }
+    .bg-primary {
+      background-color: rgb(204, 204, 255) !important;
+      border: 1px solid rgb(93, 63, 211) !important;
+    }
   }
 `;
 
@@ -33,12 +59,46 @@ function TimelineBody() {
     (state) => state.timelineReducer
   );
 
+  const [openedCommentSectImgs, setOpenCommentSecImgs] = useState([]);
+  const [newCommentInImgs, setNewCommentInImgs] = useState([]);
+
   useEffect(() => {
     dispatch(getTimeLineImagesAction());
   }, []);
 
   const updateLikeCount = (imgDetail, flag) => {
     dispatch(updateLikeCountAction(imgDetail, flag));
+  };
+
+  const openCommentSection = (imgDetail) => {
+    const { _id } = imgDetail;
+    if (openedCommentSectImgs.includes(_id))
+      setOpenCommentSecImgs([
+        ...openedCommentSectImgs.filter((id) => id !== _id),
+      ]);
+    else setOpenCommentSecImgs([...openedCommentSectImgs, _id]);
+  };
+
+  const updateComment = (imgDetail) => {
+    const comment = newCommentInImgs.find(
+      ({ id }) => imgDetail._id === id
+    ).comment;
+    if (comment)
+      dispatch(
+        updateImgCommentAction(imgDetail, comment, () => {
+          setNewCommentInImgs(
+            newCommentInImgs.filter(({ id }) => imgDetail._id !== id)
+          );
+        })
+      );
+    else return;
+  };
+
+  const getCurrentCommentValue = (imgDetail) => {
+    let { comment = "" } =
+      newCommentInImgs.find(({ id }) => imgDetail._id === id) || {};
+    if (comment) return comment;
+    else return "";
   };
 
   const getTimelineContent = () => {
@@ -87,19 +147,107 @@ function TimelineBody() {
                     <BsFillHeartFill
                       onClick={() => updateLikeCount(image, "DECREMENT")}
                       size={25}
-                      className="me-2"
+                      className="me-2 cursor-pointer"
                       color="red"
                     />
                   ) : (
                     <BsHeart
                       onClick={() => updateLikeCount(image, "INCREMENT")}
                       size={25}
-                      className="me-2"
+                      className="me-2 cursor-pointer"
                     />
                   )}
                   {image.likes} likes
-                  <BsChat size={24} className="mx-2" />
+                  <BsChat
+                    onClick={() => openCommentSection(image)}
+                    size={24}
+                    className="mx-2 cursor-pointer"
+                  />
                   {image.commentSection.length} comments
+                  {openedCommentSectImgs.includes(image._id) ? (
+                    <ListGroup className="my-2 p-2 list-grp-custom-cls list-group-flush">
+                      {image.commentSection.map((comment) => (
+                        <ListGroup.Item className="d-flex">
+                          <ProfileIcon
+                            iconText={comment.userName.charAt(0).toUpperCase()}
+                            iconSize="28px"
+                          />
+                          <span
+                            className="ms-2 d-flex justify-content-between"
+                            style={{ fontSize: 14, width: "100%" }}
+                          >
+                            <div>
+                              <span style={{ fontWeight: "bold" }}>
+                                {comment.userName}:
+                              </span>
+                              <span>&nbsp;{comment.comment}</span>
+                            </div>
+                            <span
+                              className="ms-2"
+                              style={{
+                                fontWeight: "bold",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {unixTimeToReadableFormat(comment.commentedOn)}
+                            </span>
+                          </span>
+                        </ListGroup.Item>
+                      ))}
+                      <ListGroup.Item className="d-flex">
+                        <ProfileIcon
+                          iconText={currentUser().charAt(0).toUpperCase()}
+                          iconSize="28px"
+                          className="me-2 profile-comment"
+                        />
+                        <Form.Control
+                          style={{ flex: 20 }}
+                          placeholder="Add your comment"
+                          value={getCurrentCommentValue(image)}
+                          onChange={(e) => {
+                            if (
+                              newCommentInImgs.some(
+                                ({ id }) => image._id === id
+                              )
+                            ) {
+                              let updateCommentImgs = [...newCommentInImgs];
+                              updateCommentImgs.splice(
+                                newCommentInImgs.findIndex(
+                                  ({ id }) => image._id === id
+                                ),
+                                1,
+                                {
+                                  id: image._id,
+                                  comment: e.target.value,
+                                }
+                              );
+                              setNewCommentInImgs(updateCommentImgs);
+                            } else {
+                              setNewCommentInImgs([
+                                ...newCommentInImgs,
+                                {
+                                  id: image._id,
+                                  comment: e.target.value,
+                                },
+                              ]);
+                            }
+                          }}
+                        />
+                        <div style={{ flex: 2 }}>
+                          <Badge
+                            className="ms-2 cursor-pointer"
+                            text="dark"
+                            style={{ background: "rgb(204,204,255)" }}
+                            onClick={() => updateComment(image)}
+                          >
+                            Post
+                          </Badge>
+                        </div>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  ) : (
+                    <></>
+                  )}
                 </Card.Footer>
               </Card>
             ))}

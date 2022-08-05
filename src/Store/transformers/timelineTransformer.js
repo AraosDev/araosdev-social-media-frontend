@@ -63,3 +63,31 @@ export const updateLikeCountTransformer = (
   allTimelineImages.splice(affectedPostIndex, 1, updateAffectedPost);
   return { allTimelineImages };
 };
+
+export const updateCommentTransformer = (
+  allImages,
+  commentedImgDetail,
+  comment
+) => {
+  let updatedTimelineImgs = [...allImages];
+  const commentedImg = updatedTimelineImgs.find(
+    ({ _id }) => commentedImgDetail._id === _id
+  );
+  const commentedImgIndex = updatedTimelineImgs.findIndex(
+    ({ _id }) => commentedImgDetail._id === _id
+  );
+  let updatedImg = {
+    ...commentedImg,
+    commentSection: [
+      ...commentedImg.commentSection,
+      {
+        comment,
+        commentedOn: Math.round(new Date().getTime() / 1000),
+        userName: currentUser(),
+      },
+    ],
+  };
+  updatedTimelineImgs.splice(commentedImgIndex, 1, updatedImg);
+
+  return updatedTimelineImgs;
+};

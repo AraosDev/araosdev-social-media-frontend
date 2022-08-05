@@ -2,6 +2,7 @@ import { getTimelineImgApi, postUpdateImgMetaDataAPI } from "../../api/getApi";
 import { currentUser } from "../../Common/helperFns";
 import {
   transformTimeLineResponse,
+  updateCommentTransformer,
   updateLikeCountTransformer,
 } from "../transformers/timelineTransformer";
 
@@ -52,6 +53,7 @@ export const updateLikeCountAction =
     };
 
     dispatch(setTimeline(updatedTimeLine));
+
     let property = `updateLike/${currentUser()}`;
     const reqBody = {
       postName: imgDetail.image,
@@ -62,11 +64,39 @@ export const updateLikeCountAction =
     postUpdateImgMetaDataAPI(property, reqBody)
       .then((res) => {
         const status = res.data.status;
-        if (status !== "LIKE_UPDATED") {
-          dispatch(setTimeline(timelineRollBack));
-        }
+        if (status !== "LIKE_UPDATED") dispatch(setTimeline(timelineRollBack));
       })
-      .catch(() => {
-        dispatch(setTimeline(timelineRollBack));
-      });
+      .catch(() => dispatch(setTimeline(timelineRollBack)));
+  };
+
+export const updateImgCommentAction =
+  (imgDetail, comment, callback) => (dispatch, getState) => {
+    const allTimeLineImgs = getState().timelineReducer.timelineImages;
+
+    let updatedTimeLine = {
+      state: "TIMELINE_LOADED",
+      images: updateCommentTransformer(allTimeLineImgs, imgDetail, comment),
+    };
+    let timelineRollBack = {
+      state: "TIMELINE_LOADED",
+      images: allTimeLineImgs,
+    };
+
+    dispatch(setTimeline(updatedTimeLine));
+    if (callback) callback();
+
+    let property = `updateComment/${currentUser()}`;
+    const reqBody = {
+      postName: imgDetail.image,
+      postedBy: imgDetail.userName,
+      comment,
+    };
+
+    postUpdateImgMetaDataAPI(property, reqBody)
+      .then((res) => {
+        let status = res.data.status;
+        if (status !== "COMMENT_UPDATED")
+          dispatch(setTimeline(timelineRollBack));
+      })
+      .catch(() => dispatch(setTimeline(timelineRollBack)));
   };
