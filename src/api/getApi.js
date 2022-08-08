@@ -20,3 +20,13 @@ export const postUpdateImgMetaDataAPI = (property, reqBody) => {
   const url = urls["postUpdateImgMetaData"](property);
   return axios.post(url, reqBody);
 };
+
+export const getFrndSearchApi = (property) => {
+  const url = urls["getFrndSearch"](property);
+  return axios.get(url);
+};
+
+export const postFrndReqApi = (property, reqBody) => {
+  const url = urls["postFrndReq"](property);
+  return axios.post(url, reqBody);
+}

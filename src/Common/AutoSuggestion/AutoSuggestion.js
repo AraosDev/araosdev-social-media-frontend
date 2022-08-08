@@ -1,22 +1,20 @@
 import { useState } from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
-
-import { Loader } from 'common/components/DataTransitionHandler';
-import PropTypes from 'prop-types';
-
-import { useDebounce } from '../Utils';
+import { Loader } from '../DataTransitionHandlers';
+import { useDebounce } from '../helperFns';
 
 import './AutoSuggestion.css';
 
 function AutoSuggestion({
   inputTypeProps = {},
   totalList,
-  loaderMsg = 'Loading Account Names...',
+  loaderMsg = 'Searching...',
   onSearchKeyChange,
   defaultValue = '',
   onSuggestionClick,
   minLengthToShowSuggestion = 1,
   notEnoughTextLengthMsg = '',
+  customListComponent
 }) {
   const {
     label = '',
@@ -61,24 +59,33 @@ function AutoSuggestion({
     }
   };
 
+  const onHoverList = ({ valueId, value }) => {
+    setActiveValueId('');
+    onSuggestionClick({ valueId, value });
+    setSearchKey(value);
+  }
+
   const getSuggestionsLists = () => {
     if (Array.isArray(filteredSuggestion) && filteredSuggestion.length) {
       return (
         <>
           {filteredSuggestion.map(({ value, valueId }, index) => (
-            <li
-              key={valueId}
-              className={`${
-                activeValueId === index && 'list-item-active'
-              } cursor-pointer list-item px-3 pt-2`}
-              onMouseDown={() => {
-                setActiveValueId('');
-                onSuggestionClick({ valueId, value });
-                setSearchKey(value);
-              }}
-            >
-              {value}
-            </li>
+            <>
+              {
+                customListComponent ? customListComponent({ valueId, value }, onHoverList, `${
+                  activeValueId === index && 'list-item-active'
+                } cursor-pointer list-item px-3 pt-2`) : 
+                <li
+                  key={valueId}
+                  className={`${
+                    activeValueId === index && 'list-item-active'
+                  } cursor-pointer list-item px-3 pt-2`}
+                  onMouseDown={() => onHoverList({ valueId, value })}
+                >
+                  {value}
+                </li>
+              }
+            </>
           ))}
         </>
       );
@@ -141,10 +148,10 @@ function AutoSuggestion({
           }}
           placeholder={placeholder || ''}
           name={name}
-          onBlur={() => {
+          /* onBlur={() => {
             setShowSuggestion(false);
             setActiveValueId('');
-          }}
+          }} */
           onFocus={() => setShowSuggestion(true)}
           onKeyDown={handleKeyDown}
         />
@@ -167,24 +174,5 @@ function AutoSuggestion({
     </>
   );
 }
-
-AutoSuggestion.propTypes = {
-  children: PropTypes.node,
-  inputTypeProps: PropTypes.shape({
-    label: PropTypes.string,
-    placeholder: PropTypes.string,
-    disabled: PropTypes.bool,
-    caption: PropTypes.string,
-  }),
-  totalList: PropTypes.arrayOf(PropTypes.shape({})),
-  isMultiSelect: PropTypes.bool,
-  loaderMsg: PropTypes.string,
-  onSearchKeyChange: PropTypes.func,
-  defaultValue: PropTypes.any,
-  onSuggestionClick: PropTypes.func,
-  clearSuggestionFlag: PropTypes.bool,
-  minLengthToShowSuggestion: PropTypes.number,
-  notEnoughTextLengthMsg: PropTypes.string,
-};
 
 export default AutoSuggestion;

@@ -34,11 +34,11 @@ export const StyledDataTransition = styled.div`
       }
 `
 
-export const Loader = ({message='Loading', inlineText = false, className})=>{
+export const Loader = ({message='Loading', inlineText = false, className, noMsg=false})=>{
     return (
         <StyledDataTransition inlineText={inlineText} className={className}>
             <div className='spinner'></div>
-            <span>{message}</span>
+            {!noMsg && <span>{message}</span>}
         </StyledDataTransition>
     )
 }

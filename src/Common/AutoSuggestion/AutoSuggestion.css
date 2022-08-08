@@ -16,8 +16,7 @@
 
 .list-item:hover,
 .list-item-active {
-  background: #aaa;
-  color: #fff;
+  background: #E8E8E8;
 }
 
 .bg-primary-badge {
