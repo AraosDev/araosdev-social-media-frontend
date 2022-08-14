@@ -16,6 +16,10 @@ export const getTimelineImgApi = (property) => {
   return axios.get(url);
 };
 
+export const postTimelineImgApi = (property, reqBody, params) => {
+  const url = urls["postTimelineImg"](property);
+  return axios.post(url, reqBody, {params});
+}
 export const postUpdateImgMetaDataAPI = (property, reqBody) => {
   const url = urls["postUpdateImgMetaData"](property);
   return axios.post(url, reqBody);
@@ -30,3 +34,4 @@ export const postFrndReqApi = (property, reqBody) => {
   const url = urls["postFrndReq"](property);
   return axios.post(url, reqBody);
 }
+

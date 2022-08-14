@@ -28,6 +28,11 @@ export const currentUser = () =>
     ? JSON.parse(localStorage.getItem("userInfo")).userName
     : "";
 
+export const currentUserInfo = () =>
+  localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : {};
+
 export const debounce = (func, delay) => {
   let timer;
   return function () {
@@ -55,4 +60,13 @@ export const frndUserRelations = {
   "REJECT_REQ": { label: 'Reject Request', reqType: 'REJECT_REQ', loaderLabel: 'Rejecting Request' },
   "REVOKE_REQ": { label: 'Revoke Request', reqType: 'REVOKE_REQ', loaderLabel: 'Revoking Request' },
   "REMOVE_FRIEND": { label: 'Remove Friend', reqType: 'REMOVE_FRIEND', loaderLabel: 'Removing Friend' },
+}
+
+export const randomString = (len) => {
+  const chars = '0123456789abcdefghighijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
+  for(var i=len; i>0; --i) {
+    result += chars[Math.round(Math.random() * (chars.length - 1))];
+  }
+  return result;
 }

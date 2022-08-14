@@ -1,15 +1,20 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
-import { Badge, Form } from "react-bootstrap";
-import { BsPlusSquare } from "react-icons/bs";
-import { useDispatch } from "react-redux";
+import { Badge, Dropdown, Form } from "react-bootstrap";
+import { BsPlusSquare, BsXLg } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import AutoSuggestion from "../../Common/AutoSuggestion/AutoSuggestion";
 import { Loader } from "../../Common/DataTransitionHandlers";
 import FormHeader from "../../Common/FormHeader";
-import { currentUser, frndUserRelations } from "../../Common/helperFns";
+import { currentUser, currentUserInfo, unixTimeToReadableFormat } from "../../Common/helperFns";
+import ModalComp from "../../Common/ModalComp";
 import ProfileIcon from "../../Common/ProfileIcon";
+import TimelinePostCard from "../../Common/TimelinePostCard";
 import { friendRequestAction, getFrndSuggestionAction } from "../../Store/actions/frndRequestsActions";
+import { postTimelineImageAction, setTimeline } from "../../Store/actions/timelineActions";
+import { frndUserRelation } from "./HelperFns";
 
 const StyledTimeLineHeader = styled.div`
   display: flex;
@@ -33,29 +38,34 @@ const StyledTimeLineHeader = styled.div`
 `;
 
 function TimeLineHeader() {
-  const dispatch = useDispatch()
-  const { userName = "", friends, friendRequests = {} } = localStorage.getItem("userInfo")
-    ? JSON.parse(localStorage.getItem("userInfo"))
-    : {};
-  const { requestedTo, requestedBy } = friendRequests;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { userName = "" } = currentUserInfo();
+
+  const postedImgRef = useRef(null);
+
+  const { timelineState, timelineImages } = useSelector(
+    (state) => state.timelineReducer
+  );
 
   const [selectedFrnd, setSelectedFrnd] = useState('');
   const [frndSuggestions, setFrndSuggestions] = useState([]);
   const [frndReqState, setFrndReqState] = useState([]);
+  const [openAddPostModal, setOpenAddPostModal] = useState(false);
+  const [postedImg, setPostedImg] = useState(null);
+  const [postedImgCaption, setPostedImgCaption] = useState('');
+  const [postImgState, setPostImgState] = useState('');
+  const [openProfileDrpDwn, setOpenProfileDrpDwn] = useState(false);
 
   const getFrndSuggestions = (value) => {
     dispatch(getFrndSuggestionAction(value, setFrndSuggestions));
   }
 
-  const frndUserRelation = (frnd) => {
-    if (requestedBy.includes(frnd)) return {label: '', reqType: '', loaderLabel: ''}
-    else if (requestedTo.includes(frnd)) return frndUserRelations['REVOKE_REQ']
-    else if (friends.includes(frnd)) return frndUserRelations['REMOVE_FRIEND']
-    else return frndUserRelations['ADD_FRIEND'];
-  }
-
   const frndUserRelationChange = (frnd, label, event) => {
-    if (event) event.stopPropagation();
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     const { reqType } = frndUserRelation(frnd);
     let reqBody;
     if (reqType) {
@@ -72,17 +82,22 @@ function TimeLineHeader() {
       };
     } 
       dispatch(friendRequestAction(reqBody, (state) => {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
         let existingStates = [...frndReqState];
         const currentFrndReqState = existingStates.find(({ frnd: friend }) => friend === frnd);
         const currentFrndReqStateIndex = existingStates.findIndex(({ frnd: friend }) => friend === frnd);
+        const { requestType } = reqBody;
         if (currentFrndReqState) {
           let newState = {
             ...currentFrndReqState,
-            state: `${reqType}_${state}`,
+            state: `${requestType}_${state}`,
           };
           existingStates.splice(currentFrndReqStateIndex, 1, newState);
         }
-        else existingStates.push({frnd, state: `${reqType}_${state}`});
+        else existingStates.push({frnd, state: `${requestType}_${state}`});
         setFrndReqState(existingStates);
       }))
   };
@@ -107,7 +122,7 @@ function TimeLineHeader() {
       <div>
         {
           ['Reject Request', 'Accept Request'].map(label => (
-            <Badge onClick={(e) => frndUserRelationChange(frnd, label, e)} className="cursor-pointer mx-2" text="dark">
+            <Badge onMouseDown={(e) => frndUserRelationChange(frnd, label, e)} className="cursor-pointer mx-2" text="dark">
               {label}
             </Badge>
           ))
@@ -115,15 +130,100 @@ function TimeLineHeader() {
       </div>
     );
     else return (
-      <Badge onClick={(e) => frndUserRelationChange(frnd, '', e)} className="cursor-pointer" text="dark">
+      <Badge onMouseDown={(e) => frndUserRelationChange(frnd, '', e)} className="cursor-pointer" text="dark">
         {label}
       </Badge>
     );
 
   };
 
+  const onCaptureUploadedImg = (e) => {
+    if(e.target.files && e.target.files.length) {
+      setPostedImg(e.target.files[0]);
+    }
+  }
+
+  const closeModal = () => {
+    setPostedImg(null);
+    setPostedImgCaption('');
+    postedImgRef.current = null;
+    setPostImgState('');
+    setOpenAddPostModal(false);
+  }
+
+  const postTimelineImage = () => {
+    const { name } = postedImg;
+    const supportedImgFormats = ['jpg', 'jpeg', 'png'];
+    if (supportedImgFormats.includes(name.split(".").pop())) {
+      dispatch(postTimelineImageAction(postedImg, postedImgCaption, (state) => {
+        if (state !== 'LOADED') setPostImgState(state);
+        if (state === 'LOADED') closeModal();
+      }));
+    } else return;
+  }
+
+  const switchToFriendListView = () => {
+    let newTimelineState = {
+      state: timelineState === 'TIMELINE_LOADED' ? 'FRIEND_LIST_VIEW' : 'TIMELINE_LOADED',
+      images: timelineImages
+    };
+    dispatch(setTimeline(newTimelineState));
+    setOpenProfileDrpDwn(false);
+  }
+
   return (
     <StyledTimeLineHeader>
+      <ModalComp 
+        openModalState={openAddPostModal}
+        onCloseModal={() => closeModal()}
+        modalSize='lg'
+        header="Add your post"
+        bodyClass='d-flex flex-column'
+        proceedValidation={postedImg && postedImgCaption && !postImgState}
+        proceedHandler={postTimelineImage}
+        validationMsg={!postedImg ? 'Please upload an image to post' : !postedImgCaption ? 'Please type in image caption' : ''}
+        modalBody={() => (
+          <>
+            {
+              postImgState === 'ERROR' ?
+              <div style={{height: 400}}>Something went wrong. Please try again after Some time.</div> :
+              postImgState === 'LOADING' ? 
+              <div style={{height: 400}}><Loader message="Posting your image" /></div> :
+              <>
+                <Form.Group style={{ flex: 1 }} className="mb-3">
+                  <Form.Label>Allowed Image Format: jpg, jpeg, png</Form.Label>
+                  <div className="d-flex mb-3 align-items-center">
+                    <Form.Control ref={postedImgRef} type="file" className='me-2' onChange={onCaptureUploadedImg} />
+                    <BsXLg 
+                      onClick={() => {
+                        setPostedImg(null);
+                        postedImgRef.current.value=null
+                      }} 
+                      className='cursor-pointer' 
+                    />
+                  </div>
+                  <Form.Control value={postedImgCaption} onChange={e=>setPostedImgCaption(e.target.value)} placeholder='Type your caption here' />
+                </Form.Group>
+                <TimelinePostCard 
+                  cardClassName="mb-4"
+                  cardStyle={{ flex: 1 }}
+                  imagePostedBy={currentUser()}
+                  imagePostedOn={unixTimeToReadableFormat(Math.round(new Date().getTime() / 1000))}
+                  imgcaption={postedImgCaption}
+                  imgSrc={postedImg ? URL.createObjectURL(postedImg) : ''}
+                  commentType="none"
+                  didCurrentUserLiked={false}
+                  updateLikeCount={() => {}}
+                  imgLikes={0}
+                  commentSection={[]}
+                  noImgAvailableText='Add your image to see the preview'
+                />
+              </>
+            }
+          </>
+        )}
+        proceedLabel="Post"
+      />
       <div className="mx-3 my-2" style={{ flex: "3" }}>
         <FormHeader hr={false} inline={true} />
       </div>
@@ -159,7 +259,6 @@ function TimeLineHeader() {
               >
                 {value}
                 {getFrndRelationBadgeLabel(value)}
-              {/* <Badge className="cursor-pointer" text="dark">{frndUserRelation(value)['label']}</Badge> */}
               </li>
             )
           }}
@@ -174,11 +273,30 @@ function TimeLineHeader() {
           color="#1c1950"
           size={25}
           title="Add Post"
+          onClick={() => setOpenAddPostModal(true)}
         />
         <ProfileIcon
           iconText={userName.charAt(0).toUpperCase()}
           className="me-5"
+          onClick={() => {
+            setOpenProfileDrpDwn(!openProfileDrpDwn);
+          }}
         />
+          <Dropdown.Menu show={openProfileDrpDwn} align="end" style={{top: 60, right: 50}}>
+            <Dropdown.Item
+              onClick={() => switchToFriendListView()}
+            >
+              {timelineState === 'TIMELINE_LOADED' ? 'My Friends' : 'Timeline'}
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => {
+                localStorage.clear();
+                navigate('/', { replace: true });
+              }}
+            >
+              Logout
+            </Dropdown.Item>
+          </Dropdown.Menu>
       </div>
     </StyledTimeLineHeader>
   );

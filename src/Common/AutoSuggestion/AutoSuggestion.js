@@ -148,10 +148,10 @@ function AutoSuggestion({
           }}
           placeholder={placeholder || ''}
           name={name}
-          /* onBlur={() => {
+          onBlur={(e) => {
             setShowSuggestion(false);
             setActiveValueId('');
-          }} */
+          }}
           onFocus={() => setShowSuggestion(true)}
           onKeyDown={handleKeyDown}
         />

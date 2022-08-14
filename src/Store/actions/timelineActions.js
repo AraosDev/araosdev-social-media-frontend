@@ -1,5 +1,5 @@
-import { getTimelineImgApi, postUpdateImgMetaDataAPI } from "../../api/getApi";
-import { currentUser } from "../../Common/helperFns";
+import { getTimelineImgApi, postTimelineImgApi, postUpdateImgMetaDataAPI } from "../../api/getApi";
+import { currentUser, randomString, unixTimeToReadableFormat } from "../../Common/helperFns";
 import {
   transformTimeLineResponse,
   updateCommentTransformer,
@@ -32,6 +32,38 @@ export const getTimeLineImagesAction = () => (dispatch) => {
       dispatch(setTimeline(timelineResponse));
     });
 };
+
+export const postTimelineImageAction = (file, caption, callback) => (dispatch, getState) => {
+  const reqBody = new FormData();
+  reqBody.append('file', file);
+  if (callback) callback('LOADING');
+  postTimelineImgApi(currentUser(), reqBody, { caption })
+  .then(res => {
+    if (res.data.status === 'UPLOADED') {
+      let newTimelineData = {
+        userName: currentUser(),
+        image: file.name,
+        imageLink: `https://storage.googleapis.com/araosdev-social-media/${currentUser()}/${file.name}`,
+        imageName: file.name.split(".jpg").join("").split("jpeg").join("").split("png")[0],
+        postedDate: unixTimeToReadableFormat(Math.round(new Date().getTime() / 1000)),
+        postedOn: Math.round(new Date().getTime() / 1000),
+        likes: "0",
+        likedBy: [],
+        caption,
+        commentSection: [],
+        _id: randomString(10),
+      };
+      const timelineImges = getState().timelineReducer.timelineImages;
+      const newTimeline = {
+        state: "TIMELINE_LOADED",
+        images: [newTimelineData, ...timelineImges],
+      };
+      dispatch(setTimeline(newTimeline));
+      if (callback) callback ('LOADED');
+    }
+  })
+  .catch(() => callback && callback('ERROR'))
+}
 
 export const updateLikeCountAction =
   (imgDetail, likedFlag) => (dispatch, getState) => {
