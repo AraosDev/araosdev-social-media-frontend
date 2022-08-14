@@ -1,0 +1,24 @@
+.auto-suggestion-wrapper {
+  position: absolute;
+  max-height: 150px;
+  border: 1px solid #aaa;
+  background: #fff;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  overflow: auto;
+  z-index: 4;
+  width: 100%;
+}
+
+.list-wrapper {
+  list-style-type: none;
+}
+
+.list-item:hover,
+.list-item-active {
+  background: #E8E8E8;
+}
+
+.bg-primary-badge {
+  background-color: #e81d25 !important;
+}
