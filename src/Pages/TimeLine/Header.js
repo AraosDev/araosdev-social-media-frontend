@@ -162,9 +162,9 @@ function TimeLineHeader() {
     } else return;
   }
 
-  const switchToFriendListView = () => {
+  const switchViews = (view) => {
     let newTimelineState = {
-      state: timelineState === 'TIMELINE_LOADED' ? 'FRIEND_LIST_VIEW' : 'TIMELINE_LOADED',
+      state: view,
       images: timelineImages
     };
     dispatch(setTimeline(newTimelineState));
@@ -284,10 +284,20 @@ function TimeLineHeader() {
         />
           <Dropdown.Menu show={openProfileDrpDwn} align="end" style={{top: 60, right: 50}}>
             <Dropdown.Item
-              onClick={() => switchToFriendListView()}
+              onClick={() => {
+                let view = timelineState === 'TIMELINE_LOADED' ? 'FRIEND_LIST_VIEW' : 'TIMELINE_LOADED';
+                switchViews(view);
+              }}
             >
               {timelineState === 'TIMELINE_LOADED' ? 'My Friends' : 'Timeline'}
             </Dropdown.Item>
+            {
+              timelineState !== 'MESSAGE_VIEW' ?
+              <Dropdown.Item onClick={()=>switchViews('MESSAGE_VIEW')}>
+                Messages
+              </Dropdown.Item> :
+              <></>
+            }
             <Dropdown.Item
               onClick={() => {
                 localStorage.clear();

@@ -1,6 +1,6 @@
 const initialState = {
     timelineImages: [],
-    timelineState: ''
+    timelineState: 'TIMELINE_LOADING'
 };
 
 const timelineReducer = (state = initialState, action) => {

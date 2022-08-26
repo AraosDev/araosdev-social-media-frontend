@@ -14,6 +14,7 @@ import TimelinePostCard from "../../Common/TimelinePostCard";
 import ProfileIcon from "../../Common/ProfileIcon";
 import { currentUser, currentUserInfo } from "../../Common/helperFns";
 import { friendRequestAction } from "../../Store/actions/frndRequestsActions";
+import MessageView from "./Components/MessageView";
 
 const StyledTimelineBody = styled.div`
   max-height: calc(100vh - 85px);
@@ -311,6 +312,8 @@ function TimelineBody() {
             </Tab>
           </Tabs>
         )
+      case "MESSAGE_VIEW":
+        return (<MessageView />)
       default:
         return;
     }
@@ -318,7 +321,7 @@ function TimelineBody() {
 
   return (
     <StyledTimelineBody>
-      <Container className={`timeline-body-container ${timelineState === 'FRIEND_LIST_VIEW' ? 'frnd-list-view' : ''}`}>
+      <Container className={`timeline-body-container ${!timelineState.includes('TIMELINE') ? 'frnd-list-view' : ''}`}>
         {getTimelineContent()}
       </Container>
     </StyledTimelineBody>
