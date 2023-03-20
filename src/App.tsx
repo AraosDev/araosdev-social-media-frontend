@@ -1,3 +1,4 @@
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./Pages/Login";
@@ -7,7 +8,7 @@ import Timeline from "./Pages/TimeLine";
 function App() {
   return (
     <Routes>
-      <Route path="/" exact element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route path="/newaccount" element={<NewAccount />} />
       <Route path="/timeline" element={<Timeline />} />
     </Routes>

@@ -98,7 +98,7 @@ function NewAccount() {
         }
 
         default:
-            break;
+            return null;
     }
 }
 

@@ -43,7 +43,7 @@ export const postTimelineImageAction = (file, caption, callback) => (dispatch, g
       let newTimelineData = {
         userName: currentUser(),
         image: file.name,
-        imageLink: `https://storage.googleapis.com/araosdev-social-media/${currentUser()}/${file.name}`,
+        imageLink: `https://storage.googleapis.com/araosdev-social-media.appspot.com/${currentUser()}/${file.name}`,
         imageName: file.name.split(".jpg").join("").split("jpeg").join("").split("png")[0],
         postedDate: unixTimeToReadableFormat(Math.round(new Date().getTime() / 1000)),
         postedOn: Math.round(new Date().getTime() / 1000),
