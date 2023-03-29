@@ -1,7 +1,7 @@
-import { useCallback } from 'react'
+import { useCallback } from 'react';
 
 export const unixTimeToReadableFormat = (unixTime) => {
-  const date = new Date(unixTime * 1000)
+  const date = new Date(unixTime * 1000);
   const months = [
     'Jan',
     'Feb',
@@ -14,59 +14,80 @@ export const unixTimeToReadableFormat = (unixTime) => {
     'Sep',
     'Oct',
     'Nov',
-    'Dec'
-  ]
+    'Dec',
+  ];
   const formattedDate = `${date.getDate()} ${
     months[date.getMonth()]
-  } ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
+  } ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
 
-  return formattedDate
-}
+  return formattedDate;
+};
 
 export const currentUser = () =>
   localStorage.getItem('userInfo')
     ? JSON.parse(localStorage.getItem('userInfo')).details.userName
-    : ''
+    : '';
 
 export const currentUserInfo = () =>
   localStorage.getItem('userInfo')
-    ? JSON.parse(localStorage.getItem('userInfo'))
-    : {}
+    ? JSON.parse(localStorage.getItem('userInfo')).details
+    : {};
 
 export const debounce = (func, delay) => {
-  let timer
+  let timer;
   return function () {
-    const self = this
-    const args = arguments
-    clearTimeout(timer)
+    const self = this;
+    const args = arguments;
+    clearTimeout(timer);
     timer = setTimeout(() => {
-      func.apply(self, args)
-    }, delay)
-  }
-}
+      func.apply(self, args);
+    }, delay);
+  };
+};
 
-export function useDebounce (callback, delay) {
+export function useDebounce(callback, delay) {
   const debouncedFn = useCallback(
     debounce((...args) => callback(...args), delay),
     [delay]
-  )
+  );
 
-  return debouncedFn
+  return debouncedFn;
 }
 
 export const frndUserRelations = {
-  ADD_FRIEND: { label: 'Add Friend', reqType: 'SEND_REQ', loaderLabel: 'Sending Request' },
-  ACCEPT_REQ: { label: 'Accept Request', reqType: 'ACCEPT_REQ', loaderLabel: 'Accepting Request' },
-  REJECT_REQ: { label: 'Reject Request', reqType: 'REJECT_REQ', loaderLabel: 'Rejecting Request' },
-  REVOKE_REQ: { label: 'Revoke Request', reqType: 'REVOKE_REQ', loaderLabel: 'Revoking Request' },
-  REMOVE_FRIEND: { label: 'Remove Friend', reqType: 'REMOVE_FRIEND', loaderLabel: 'Removing Friend' }
-}
+  ADD_FRIEND: {
+    label: 'Add Friend',
+    reqType: 'SEND_REQ',
+    loaderLabel: 'Sending Request',
+  },
+  ACCEPT_REQ: {
+    label: 'Accept Request',
+    reqType: 'ACCEPT_REQ',
+    loaderLabel: 'Accepting Request',
+  },
+  REJECT_REQ: {
+    label: 'Reject Request',
+    reqType: 'REJECT_REQ',
+    loaderLabel: 'Rejecting Request',
+  },
+  REVOKE_REQ: {
+    label: 'Revoke Request',
+    reqType: 'REVOKE_REQ',
+    loaderLabel: 'Revoking Request',
+  },
+  REMOVE_FRIEND: {
+    label: 'Remove Friend',
+    reqType: 'REMOVE_FRIEND',
+    loaderLabel: 'Removing Friend',
+  },
+};
 
 export const randomString = (len) => {
-  const chars = '0123456789abcdefghighijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  let result = ''
+  const chars =
+    '0123456789abcdefghighijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
   for (let i = len; i > 0; --i) {
-    result += chars[Math.round(Math.random() * (chars.length - 1))]
+    result += chars[Math.round(Math.random() * (chars.length - 1))];
   }
-  return result
-}
+  return result;
+};

@@ -1,8 +1,10 @@
-import { Route, Routes } from "react-router-dom";
-import "./App.css";
-import Login from "./Pages/Login";
-import NewAccount from "./Pages/NewAccount";
-import Timeline from "./Pages/TimeLine";
+import { Route, Routes } from 'react-router-dom';
+
+import Login from './Pages/Login';
+import NewAccount from './Pages/NewAccount';
+import Timeline from './Pages/TimeLine';
+
+import './App.css';
 
 function App() {
   return (

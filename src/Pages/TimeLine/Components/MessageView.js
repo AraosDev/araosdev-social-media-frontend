@@ -1,8 +1,8 @@
-import React from "react";
-import { ListGroup } from "react-bootstrap";
-import styled from "styled-components";
-import { currentUserInfo } from "../../../Common/helperFns";
-import ProfileIcon from "../../../Common/ProfileIcon";
+import React from 'react';
+import { ListGroup } from 'react-bootstrap';
+import styled from 'styled-components';
+import { currentUserInfo } from '../../../Common/helperFns';
+import ProfileIcon from '../../../Common/ProfileIcon';
 
 const StyledMsgView = styled.div`
   border-radius: 4px;

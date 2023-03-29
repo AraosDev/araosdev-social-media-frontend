@@ -1,25 +1,25 @@
 const initialState = {
   timelineImages: [],
-  timelineState: 'TIMELINE_LOADING'
-}
+  timelineState: 'TIMELINE_LOADING',
+};
 
 const timelineReducer = (state = initialState, action) => {
-  let newState = { ...state }
+  let newState = { ...state };
 
   switch (action.type) {
     case 'SET_TIMELINE': {
-      newState.timelineImages = action.payload.images
-      newState.timelineState = action.payload.state
-      break
+      newState.timelineImages = action.payload.images;
+      newState.timelineState = action.payload.state;
+      break;
     }
 
     default: {
-      newState = { ...state }
-      break
+      newState = { ...state };
+      break;
     }
   }
 
-  return newState
-}
+  return newState;
+};
 
-export default timelineReducer
+export default timelineReducer;

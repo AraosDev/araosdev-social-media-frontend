@@ -1,39 +1,42 @@
 interface UserInfo {
-  userName: string
-  email: string
-  phoneNumber: string
-  friends: string[]
+  userName: string;
+  email: string;
+  phoneNumber: string;
+  friends: string[];
   friendRequests: {
-    requestedTo: string[]
-    requestedBy: string[]
-  }
+    requestedTo: string[];
+    requestedBy: string[];
+  };
 }
 
 interface LoggedUserInfoApiRes {
-  status: number
-  credentialsVerified: string
-  details: UserInfo
+  status: number;
+  credentialsVerified: string;
+  details: UserInfo;
 }
 
 interface UserCredentials {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 interface CreateAccountPayload {
-  username: string
-  password: string
-  email: string
-  phonenumber: phnNumber
+  username: string;
+  password: string;
+  email: string;
+  phonenumber: phnNumber;
 }
 
 interface CreateAccountSucessRes {
-  status: 200
-  updated: 'OK'
+  status: 200;
+  updated: 'OK';
 }
 
 interface CreateAccountErrRes {
-  status: 400
-  updated: 'FAILED'
-  message: 'ACCOUNT_LIMIT_EXCEEDED' | 'ALREADY_EXISTING_ACCOUNT' | 'UNKNOWN_ERROR'
+  status: 400;
+  updated: 'FAILED';
+  message:
+    | 'ACCOUNT_LIMIT_EXCEEDED'
+    | 'ALREADY_EXISTING_ACCOUNT'
+    | 'UNKNOWN_ERROR';
 }
