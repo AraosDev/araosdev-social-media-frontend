@@ -1,33 +1,34 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { Badge, Card, Form, ListGroup } from 'react-bootstrap'
 import { BsChat, BsFillHeartFill, BsHeart } from 'react-icons/bs'
 import { currentUser, unixTimeToReadableFormat } from './helperFns'
 import ProfileIcon from './ProfileIcon'
 
-function TimelinePostCard({
-    cardClassName = '',
-    cardStyle = {},
-    imagePostedBy='',
-    imagePostedOn,
-    imgcaption,
-    imgSrc,
-    commentType = 'normal',
-    didCurrentUserLiked,
-    updateLikeCount,
-    imgLikes,
-    openCommentSection,
-    commentSection,
-    shouldOpenCommentSection,
-    commentSectionClass = '',
-    customCommentComponent,
-    includeAddNewComment,
-    newComment,
-    newCommentChangeHandler,
-    postNewCommentHandler,
-    noImgAvailableText="",
-    ...cardProps
+function TimelinePostCard ({
+  cardClassName = '',
+  cardStyle = {},
+  imagePostedBy = '',
+  imagePostedOn,
+  imgcaption,
+  imgSrc,
+  commentType = 'normal',
+  didCurrentUserLiked,
+  updateLikeCount,
+  imgLikes,
+  openCommentSection,
+  commentSection,
+  shouldOpenCommentSection,
+  commentSectionClass = '',
+  customCommentComponent,
+  includeAddNewComment,
+  newComment,
+  newCommentChangeHandler,
+  postNewCommentHandler,
+  noImgAvailableText = '',
+  ...cardProps
 }) {
-    return (
+  return (
         <Card className={cardClassName} style={cardStyle} {...cardProps}>
             <Card.Header className='d-flex'>
                 <ProfileIcon iconText={imagePostedBy.charAt(0).toUpperCase()} />
@@ -44,13 +45,13 @@ function TimelinePostCard({
                     {imgcaption}
                 </Card.Subtitle>
                 {
-                    imgSrc ? 
-                    <Card.Img
-                        style={{ width: "100%", height: 600, objectFit: "cover" }}
+                    imgSrc
+                      ? <Card.Img
+                        style={{ width: '100%', height: 600, objectFit: 'cover' }}
                         src={imgSrc}
-                    /> :
-                    <div 
-                        style={{ width: "100%", height: 300, objectFit: "cover", fontSize: 24, color: 'grey' }}
+                    />
+                      : <div
+                        style={{ width: '100%', height: 300, objectFit: 'cover', fontSize: 24, color: 'grey' }}
                         className='d-flex justify-content-center align-items-center'
                     >
                         {noImgAvailableText}
@@ -59,15 +60,15 @@ function TimelinePostCard({
             </Card.Body>
             <Card.Footer>
                 {
-                    didCurrentUserLiked ?
-                        <BsFillHeartFill
-                            onClick={() => updateLikeCount("DECREMENT")}
+                    didCurrentUserLiked
+                      ? <BsFillHeartFill
+                            onClick={() => updateLikeCount('DECREMENT')}
                             size={25}
                             className="me-2 cursor-pointer"
                             color="red"
-                        /> :
-                        <BsHeart
-                            onClick={() => updateLikeCount("INCREMENT")}
+                        />
+                      : <BsHeart
+                            onClick={() => updateLikeCount('INCREMENT')}
                             size={25}
                             className="me-2 cursor-pointer"
                         />
@@ -80,21 +81,21 @@ function TimelinePostCard({
                 />
                 {commentSection.length} comments
                 {
-                    shouldOpenCommentSection && commentType === 'normal' ?
-                        <ListGroup className={`my-2 p-2 list-group-flush ${commentSectionClass}`}>
+                    shouldOpenCommentSection && commentType === 'normal'
+                      ? <ListGroup className={`my-2 p-2 list-group-flush ${commentSectionClass}`}>
                             {
                                 commentSection.map((comment) => (
-                                    <ListGroup.Item className='d-flex'>
+                                    <ListGroup.Item key={comment.comment} className='d-flex'>
                                         <ProfileIcon
                                             iconText={comment.userName.charAt(0).toUpperCase()}
                                             iconSize="28px"
                                         />
                                         <span
                                             className="ms-2 d-flex justify-content-between"
-                                            style={{ fontSize: 14, width: "100%" }}
+                                            style={{ fontSize: 14, width: '100%' }}
                                         >
                                             <div>
-                                                <span style={{ fontWeight: "bold" }}>
+                                                <span style={{ fontWeight: 'bold' }}>
                                                     {comment.userName}:
                                                 </span>
                                                 <span>&nbsp;{comment.comment}</span>
@@ -102,8 +103,8 @@ function TimelinePostCard({
                                             <span
                                                 className="ms-2"
                                                 style={{
-                                                    fontWeight: "bold",
-                                                    whiteSpace: "nowrap",
+                                                  fontWeight: 'bold',
+                                                  whiteSpace: 'nowrap'
                                                 }}
                                             >
                                                 {unixTimeToReadableFormat(comment.commentedOn)}
@@ -113,8 +114,8 @@ function TimelinePostCard({
                                 ))
                             }
                             {
-                                includeAddNewComment ?
-                                <ListGroup.Item className="d-flex">
+                                includeAddNewComment
+                                  ? <ListGroup.Item className="d-flex">
                                         <ProfileIcon
                                             iconText={currentUser().charAt(0).toUpperCase()}
                                             iconSize="28px"
@@ -130,23 +131,23 @@ function TimelinePostCard({
                                             <Badge
                                                 className="ms-2 cursor-pointer"
                                                 text="dark"
-                                                style={{ background: "rgb(204,204,255)" }}
+                                                style={{ background: 'rgb(204,204,255)' }}
                                                 onClick={postNewCommentHandler}
                                             >
                                                 Post
                                             </Badge>
                                         </div>
-                                </ListGroup.Item> :
-                                <></>
+                                </ListGroup.Item>
+                                  : <></>
                             }
-                        </ListGroup> : 
-                    shouldOpenCommentSection && commentType === "custom" ? 
-                    <>{customCommentComponent()}</> :
-                    <></>
+                        </ListGroup>
+                      : shouldOpenCommentSection && commentType === 'custom'
+                        ? <>{customCommentComponent()}</>
+                        : <></>
                 }
             </Card.Footer>
         </Card>
-    )
+  )
 }
 
 export default TimelinePostCard

@@ -9,18 +9,18 @@ const StyledProfileIcon = styled.div`
     color: ${props => props.iconTextColor};
 `
 
-function ProfileIcon({ className = '', iconBg = '#1c1950', iconSize = '40px', iconTextColor = 'white', iconText = '', ...otherProps }) {
-    return (
+function ProfileIcon ({ className = '', iconBg = '#1c1950', iconSize = '40px', iconTextColor = 'white', iconText = '', ...otherProps }) {
+  return (
         <StyledProfileIcon
             iconBg={iconBg}
-            iconSize={iconSize} 
+            iconSize={iconSize}
             iconTextColor={iconTextColor}
             className={`cursor-pointer d-flex justify-content-center align-items-center ${className}`}
             {...otherProps}
         >
             <span>{iconText}</span>
         </StyledProfileIcon>
-    )
+  )
 }
 
 export default ProfileIcon

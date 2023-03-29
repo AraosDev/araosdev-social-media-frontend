@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Form, InputGroup } from 'react-bootstrap';
-import { Loader } from '../DataTransitionHandlers';
-import { useDebounce } from '../helperFns';
+import React, { useState } from 'react'
+import { Form, InputGroup } from 'react-bootstrap'
+import { Loader } from '../DataTransitionHandlers'
+import { useDebounce } from '../helperFns'
 
-import './AutoSuggestion.css';
+import './AutoSuggestion.css'
 
-function AutoSuggestion({
+function AutoSuggestion ({
   inputTypeProps = {},
   totalList,
   loaderMsg = 'Searching...',
@@ -25,44 +25,42 @@ function AutoSuggestion({
     dropDownStyle = {},
     captionStyle = {
       fontSize: 14,
-      fontWeight: 'normal',
+      fontWeight: 'normal'
     },
-    name = '',
-  } = inputTypeProps;
+    name = ''
+  } = inputTypeProps
 
-  const [searchKey, setSearchKey] = useState(defaultValue);
-  const [showSuggestion, setShowSuggestion] = useState(false);
+  const [searchKey, setSearchKey] = useState(defaultValue)
+  const [showSuggestion, setShowSuggestion] = useState(false)
 
-  const filteredSuggestion = totalList;
+  const filteredSuggestion = totalList
 
-  const [activeValueId, setActiveValueId] = useState('');
+  const [activeValueId, setActiveValueId] = useState('')
 
   const handleKeyDown = (event) => {
-    const { key } = event;
+    const { key } = event
     if (key.toLowerCase() === 'arrowup') {
-      if (!activeValueId) setActiveValueId('');
-      if (activeValueId) setActiveValueId(activeValueId - 1);
+      if (!activeValueId) setActiveValueId('')
+      if (activeValueId) setActiveValueId(activeValueId - 1)
     }
     if (key.toLowerCase() === 'arrowdown') {
-      if (activeValueId === '') setActiveValueId(0);
-      else if (activeValueId === filteredSuggestion.length - 1)
-        setActiveValueId(0);
-      else setActiveValueId(activeValueId + 1);
+      if (activeValueId === '') setActiveValueId(0)
+      else if (activeValueId === filteredSuggestion.length - 1) { setActiveValueId(0) } else setActiveValueId(activeValueId + 1)
     }
     if (key.toLowerCase() === 'enter') {
-      event.preventDefault();
-      const { value } = filteredSuggestion[activeValueId];
-      onSuggestionClick(filteredSuggestion[activeValueId]);
-      setSearchKey(value);
-      setActiveValueId('');
-      setShowSuggestion(false);
+      event.preventDefault()
+      const { value } = filteredSuggestion[activeValueId]
+      onSuggestionClick(filteredSuggestion[activeValueId])
+      setSearchKey(value)
+      setActiveValueId('')
+      setShowSuggestion(false)
     }
-  };
+  }
 
   const onHoverList = ({ valueId, value }) => {
-    setActiveValueId('');
-    onSuggestionClick({ valueId, value });
-    setSearchKey(value);
+    setActiveValueId('')
+    onSuggestionClick({ valueId, value })
+    setSearchKey(value)
   }
 
   const getSuggestionsLists = () => {
@@ -72,10 +70,11 @@ function AutoSuggestion({
           {filteredSuggestion.map(({ value, valueId }, index) => (
             <>
               {
-                customListComponent ? customListComponent({ valueId, value }, onHoverList, `${
+                customListComponent
+                  ? customListComponent({ valueId, value }, onHoverList, `${
                   activeValueId === index && 'list-item-active'
-                } cursor-pointer list-item px-3 pt-2`) : 
-                <li
+                } cursor-pointer list-item px-3 pt-2`)
+                  : <li
                   key={valueId}
                   className={`${
                     activeValueId === index && 'list-item-active'
@@ -88,13 +87,13 @@ function AutoSuggestion({
             </>
           ))}
         </>
-      );
+      )
     } else if (
       !Array.isArray(filteredSuggestion) &&
       (filteredSuggestion === 'NOT_ENOUGH_LENGTH' || !filteredSuggestion)
     ) {
-      if (notEnoughTextLengthMsg) return <li>{notEnoughTextLengthMsg}</li>;
-      return <li>Please type minimum {minLengthToShowSuggestion} letter</li>;
+      if (notEnoughTextLengthMsg) return <li>{notEnoughTextLengthMsg}</li>
+      return <li>Please type minimum {minLengthToShowSuggestion} letter</li>
     } else if (
       !Array.isArray(filteredSuggestion) &&
       filteredSuggestion === 'LOADING'
@@ -103,19 +102,19 @@ function AutoSuggestion({
         <li>
           <Loader message={loaderMsg} />
         </li>
-      );
+      )
     } else if (
       !Array.isArray(filteredSuggestion) &&
       filteredSuggestion === 'EMPTY'
     ) {
-      return <li className="px-3 py-2">No Item in the Suggestion</li>;
-    } else return <li>Some Error Occurred. Please Retry after sometime</li>;
-  };
+      return <li className="px-3 py-2">No Item in the Suggestion</li>
+    } else return <li>Some Error Occurred. Please Retry after sometime</li>
+  }
 
   const debouncedSuggestionSearch = useDebounce(
     (searchWords) => onSearchKeyChange(searchWords),
     1000
-  );
+  )
 
   return (
     <>
@@ -123,7 +122,7 @@ function AutoSuggestion({
       <InputGroup
         className="d-flex align-items-center"
         style={{
-          flexDirection: 'column',
+          flexDirection: 'column'
         }}
       >
         <Form.Control
@@ -134,23 +133,23 @@ function AutoSuggestion({
             fontSize: inputTextFontSize,
             overflow: 'hidden',
             whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
+            textOverflow: 'ellipsis'
           }}
           value={searchKey}
           disabled={disabled}
           onChange={(e) => {
-            const value = e.target.value;
-            setSearchKey(value);
-            debouncedSuggestionSearch(value.trim());
+            const value = e.target.value
+            setSearchKey(value)
+            debouncedSuggestionSearch(value.trim())
             if (!value) {
-              onSuggestionClick({ value: '', valueId: '' });
+              onSuggestionClick({ value: '', valueId: '' })
             }
           }}
           placeholder={placeholder || ''}
           name={name}
           onBlur={(e) => {
-            setShowSuggestion(false);
-            setActiveValueId('');
+            setShowSuggestion(false)
+            setActiveValueId('')
           }}
           onFocus={() => setShowSuggestion(true)}
           onKeyDown={handleKeyDown}
@@ -172,7 +171,7 @@ function AutoSuggestion({
       </InputGroup>
       <span style={captionStyle}>{caption}</span>
     </>
-  );
+  )
 }
 
-export default AutoSuggestion;
+export default AutoSuggestion
