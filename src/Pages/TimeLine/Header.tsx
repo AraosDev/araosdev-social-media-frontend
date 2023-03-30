@@ -1,20 +1,18 @@
+/* eslint-disable import/order */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { useRef, useState } from 'react';
+import { Badge, Dropdown, Form } from 'react-bootstrap';
+import { BsPlusSquare, BsXLg } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
+
 import {
   useFriendRequestMutation,
   usePostTimelineImgMutation,
   useSearchFriendListQuery,
 } from 'api/apiSlice';
-import { useRef, useState } from 'react';
-
-import { Badge, Dropdown, Form } from 'react-bootstrap';
-import { BsPlusSquare, BsXLg } from 'react-icons/bs';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
-import { postImageInTimeline } from 'Store/mutationTriggers/timelineTrigger';
-import { setTimelineState } from 'Store/reducer/timelineReducer';
 import styled from 'styled-components';
+
 import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
 import { Loader } from '../../Common/DataTransitionHandlers';
 import FormHeader from '../../Common/FormHeader';
@@ -22,7 +20,13 @@ import { currentUser, unixTimeToReadableFormat } from '../../Common/helperFns';
 import ModalComp from '../../Common/ModalComp';
 import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
+
 import { frndUserRelation } from './HelperFns';
+
+import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+import { postImageInTimeline } from 'Store/mutationTriggers/timelineTrigger';
+import { setTimelineState } from 'Store/reducer/timelineReducer';
+import { useAppDispatch, useAppSelector } from 'Store/store/hooks';
 
 const StyledTimeLineHeader = styled.div`
   display: flex;
@@ -45,19 +49,21 @@ const StyledTimeLineHeader = styled.div`
   }
 `;
 
-function TimeLineHeader() {
-  const dispatch = useDispatch();
+function TimeLineHeader(): React.ReactElement {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const userName = currentUser();
 
-  const postedImgRef = useRef(null);
+  const postedImgRef = useRef<null | HTMLInputElement>(null);
 
-  const { timelineState } = useSelector((state) => state.timelineReducer);
+  const { timelineState } = useAppSelector((state) => state.timelineReducer);
 
   const [selectedFrnd, setSelectedFrnd] = useState('');
-  const [frndReqState, setFrndReqState] = useState([]);
+  const [frndReqState, setFrndReqState] = useState<
+    { frnd: string; state: string }[]
+  >([]);
   const [openAddPostModal, setOpenAddPostModal] = useState(false);
-  const [postedImg, setPostedImg] = useState(null);
+  const [postedImg, setPostedImg] = useState<null | File>(null);
   const [postedImgCaption, setPostedImgCaption] = useState('');
   const [postImgState, setPostImgState] = useState('');
   const [openProfileDrpDwn, setOpenProfileDrpDwn] = useState(false);
@@ -68,17 +74,22 @@ function TimeLineHeader() {
     data: frndSuggestions,
     isFetching: isFrndSuggestionLoading,
     isError: isFrndSuggestionErr,
+    isSuccess: isFrndSuggestionFetched,
     error: frndSuggestionErr,
   } = useSearchFriendListQuery(debouncedSearchKey);
   const [friendReqtTrigger] = useFriendRequestMutation();
 
-  const frndUserRelationChange = (frnd, label, event) => {
+  const frndUserRelationChange = (
+    frnd: string,
+    label: string,
+    event: React.MouseEvent<HTMLElement, MouseEvent>
+  ) => {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
     }
     const { reqType } = frndUserRelation(frnd);
-    let reqBody;
+    let reqBody: frndRequestReq;
     if (reqType) {
       reqBody = {
         requestType: reqType,
@@ -111,7 +122,7 @@ function TimeLineHeader() {
     });
   };
 
-  const getFrndRelationBadgeLabel = (frnd) => {
+  const getFrndRelationBadgeLabel = (frnd: string) => {
     const { state = '' } =
       frndReqState.find(({ frnd: friend }) => friend === frnd) || {};
     const { label, loaderLabel } = frndUserRelation(frnd);
@@ -159,7 +170,7 @@ function TimeLineHeader() {
     );
   };
 
-  const onCaptureUploadedImg = (e) => {
+  const onCaptureUploadedImg = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length) {
       setPostedImg(e.target.files[0]);
     }
@@ -174,25 +185,29 @@ function TimeLineHeader() {
   };
 
   const postTimelineImage = () => {
-    const { name } = postedImg;
-    const supportedImgFormats = ['jpg', 'jpeg', 'png'];
-    if (supportedImgFormats.includes(name.split('.').pop().toLowerCase())) {
-      postImageInTimeline(
-        postImage,
-        {
-          file: postedImg,
-          caption: postedImgCaption,
-          username: userName,
-        },
-        (state) => {
-          if (state === 'SUCCESS') closeModal();
-          else setPostImgState(state);
-        }
-      );
+    if (postedImg) {
+      const { name = '' } = postedImg;
+      const supportedImgFormats = ['jpg', 'jpeg', 'png'];
+      if (
+        supportedImgFormats.includes(name.split('.').pop()?.toLowerCase() || '')
+      ) {
+        postImageInTimeline(
+          postImage,
+          {
+            file: postedImg,
+            caption: postedImgCaption,
+            username: userName,
+          },
+          (state) => {
+            if (state === 'SUCCESS') closeModal();
+            else setPostImgState(state);
+          }
+        );
+      }
     }
   };
 
-  const switchViews = (view) => {
+  const switchViews = (view: TimelineStates) => {
     dispatch(setTimelineState(view));
     setOpenProfileDrpDwn(false);
   };
@@ -205,7 +220,11 @@ function TimeLineHeader() {
         modalSize="lg"
         header="Add your post"
         bodyClass="d-flex flex-column"
-        proceedValidation={postedImg && postedImgCaption && !postImgState}
+        proceedValidation={
+          Boolean(postedImg) &&
+          Boolean(postedImgCaption) &&
+          !Boolean(postImgState)
+        }
         proceedHandler={postTimelineImage}
         validationMsg={
           !postedImg
@@ -237,7 +256,7 @@ function TimeLineHeader() {
                   <BsXLg
                     onClick={() => {
                       setPostedImg(null);
-                      postedImgRef.current.value = null;
+                      postedImgRef.current = null;
                     }}
                     className="cursor-pointer"
                   />
@@ -294,10 +313,12 @@ function TimeLineHeader() {
             isFrndSuggestionLoading
               ? 'LOADING'
               : isFrndSuggestionErr
-              ? frndSuggestionErr
-              : frndSuggestions
+              ? (frndSuggestionErr as unknown as 'EMPTY' | 'ERROR')
+              : isFrndSuggestionFetched && Array.isArray(frndSuggestions)
+              ? frndSuggestions
+              : []
           }
-          onSuggestionClick={setSelectedFrnd}
+          onSuggestionClick={({ value }) => setSelectedFrnd(value)}
           minLengthToShowSuggestion={1}
           onSearchKeyChange={setDebouncedSearchKey}
           customListComponent={(valObj, onHoverList, className) => {

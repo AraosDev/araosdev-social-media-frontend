@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 export const StyledDataTransition = styled.div`
@@ -38,16 +37,16 @@ export const StyledDataTransition = styled.div`
   }
 
   span {
-    margin-left: ${(props) => (props.inlineText ? `5px` : ``)};
+    margin-left: ${(props: LoaderProps) => (props.inlineText ? `5px` : ``)};
   }
 `;
 
 export function Loader({
   message = 'Loading',
   inlineText = false,
-  className,
+  className = '',
   noMsg = false,
-}) {
+}: LoaderProps) {
   return (
     <StyledDataTransition inlineText={inlineText} className={className}>
       <div className="spinner" />

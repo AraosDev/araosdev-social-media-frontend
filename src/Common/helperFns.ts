@@ -1,6 +1,11 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable prefer-rest-params */
+/* eslint-disable func-names */
 import { useCallback } from 'react';
 
-export const unixTimeToReadableFormat = (unixTime) => {
+export const unixTimeToReadableFormat = (unixTime: number) => {
   const date = new Date(unixTime * 1000);
   const months = [
     'Jan',
@@ -23,21 +28,20 @@ export const unixTimeToReadableFormat = (unixTime) => {
   return formattedDate;
 };
 
-export const currentUser = () =>
-  localStorage.getItem('userInfo')
-    ? JSON.parse(localStorage.getItem('userInfo')).details.userName
-    : '';
+export const currentUser = () => {
+  const userInfo = localStorage.getItem('userInfo');
+  return userInfo ? JSON.parse(userInfo).details.userName : '';
+};
 
-export const currentUserInfo = () =>
-  localStorage.getItem('userInfo')
-    ? JSON.parse(localStorage.getItem('userInfo')).details
-    : {};
+export const currentUserInfo = () => {
+  const userInfo = localStorage.getItem('userInfo');
+  return userInfo ? JSON.parse(userInfo).details : {};
+};
 
-export const debounce = (func, delay) => {
-  let timer;
-  return function () {
-    const self = this;
-    const args = arguments;
+export const debounce = (func: Function, delay: number) => {
+  let timer: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    const self: any = this;
     clearTimeout(timer);
     timer = setTimeout(() => {
       func.apply(self, args);
@@ -45,16 +49,16 @@ export const debounce = (func, delay) => {
   };
 };
 
-export function useDebounce(callback, delay) {
+export function useDebounce(callback: Function, delay: number) {
   const debouncedFn = useCallback(
-    debounce((...args) => callback(...args), delay),
+    debounce((...args: any) => callback(...args), delay),
     [delay]
   );
 
   return debouncedFn;
 }
 
-export const frndUserRelations = {
+export const frndUserRelations: Record<string, BadgeLabels> = {
   ADD_FRIEND: {
     label: 'Add Friend',
     reqType: 'SEND_REQ',
@@ -82,11 +86,11 @@ export const frndUserRelations = {
   },
 };
 
-export const randomString = (len) => {
+export const randomString = (len: number) => {
   const chars =
     '0123456789abcdefghighijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let result = '';
-  for (let i = len; i > 0; --i) {
+  for (let i = len; i > 0; i -= 1) {
     result += chars[Math.round(Math.random() * (chars.length - 1))];
   }
   return result;

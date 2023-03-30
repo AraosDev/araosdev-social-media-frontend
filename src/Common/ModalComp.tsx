@@ -12,7 +12,7 @@ function ModalComp({
   proceedValidation,
   proceedLabel,
   bodyClass = '',
-}) {
+}: ModalCompProps) {
   return (
     <Modal
       show={openModalState}

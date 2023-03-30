@@ -1,11 +1,14 @@
-import { useLoggedInUserInfoMutation } from 'api/apiSlice';
 import { useState } from 'react';
-import { Card, Button, Form } from 'react-bootstrap';
+import { Button, Card, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { getLoggedInUserInfo } from 'Store/mutationTriggers/loginTriggers';
+
+import { useLoggedInUserInfoMutation } from 'api/apiSlice';
+
 import './index.css';
 
-function Login() {
+import { getLoggedInUserInfo } from 'Store/mutationTriggers/loginTriggers';
+
+function Login(): React.ReactElement {
   const navigate = useNavigate();
   const [loggedInUserInfo] = useLoggedInUserInfoMutation();
 

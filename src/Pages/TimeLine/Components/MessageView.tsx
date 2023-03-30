@@ -1,6 +1,8 @@
 import React from 'react';
 import { ListGroup } from 'react-bootstrap';
+
 import styled from 'styled-components';
+
 import { currentUserInfo } from '../../../Common/helperFns';
 import ProfileIcon from '../../../Common/ProfileIcon';
 
@@ -25,12 +27,12 @@ const StyledMsgView = styled.div`
   }
 `;
 
-function MessageView() {
-  const { friends } = currentUserInfo();
+function MessageView(): React.ReactElement {
+  const { friends } = currentUserInfo() as UserInfo;
   return (
     <StyledMsgView className="py-3">
       {friends.map((friend) => (
-        <ListGroup.Item className="d-flex cursor-pointer">
+        <ListGroup.Item key={friend} className="d-flex cursor-pointer">
           <ProfileIcon
             className="message-profile-icon"
             iconText={friend.charAt(0).toUpperCase()}

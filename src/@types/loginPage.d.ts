@@ -40,3 +40,25 @@ interface CreateAccountErrRes {
     | 'ALREADY_EXISTING_ACCOUNT'
     | 'UNKNOWN_ERROR';
 }
+
+interface ErrorViewProps {
+  setView: React.Dispatch<React.SetStateAction<string>>;
+  errorType: string;
+}
+
+interface CreateAccountProps {
+  userName: string;
+  setUserName: React.Dispatch<React.SetStateAction<string>>;
+  password: string;
+  setPassword: React.Dispatch<React.SetStateAction<string>>;
+  email: string;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  confirmpassword: string;
+  setConfirmPassword: React.Dispatch<React.SetStateAction<string>>;
+  phnNumber: null | string;
+  setPhnNumber: React.Dispatch<React.SetStateAction<string | null>>;
+  accountType: null | string;
+  setAccountType: React.Dispatch<React.SetStateAction<string | null>>;
+  pwdError: boolean;
+  onCreateAccount: () => void;
+}

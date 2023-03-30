@@ -1,10 +1,11 @@
-import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+
 import FormHeader from '../../Common/FormHeader';
+
 import '../Login/index.css';
 
-function ErrorView(props) {
+function ErrorView(props: ErrorViewProps): React.ReactElement {
   const { errorType, setView } = props;
   return (
     <div className="wrapper">

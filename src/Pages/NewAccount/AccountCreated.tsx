@@ -1,10 +1,11 @@
-import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+
 import FormHeader from '../../Common/FormHeader';
+
 import '../Login/index.css';
 
-function AccountCreated(props) {
+function AccountCreated(): React.ReactElement {
   return (
     <div className="wrapper">
       <div className="cardWrapper">

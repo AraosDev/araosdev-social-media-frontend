@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
 import styled from 'styled-components';
 
 const StyledProfileIcon = styled.div`
@@ -6,7 +6,7 @@ const StyledProfileIcon = styled.div`
   height: ${(props) => props.iconSize};
   border-radius: 50%;
   background-color: ${(props) => props.iconBg};
-  color: ${(props) => props.iconTextColor};
+  color: ${(props: ProfileIconProps) => props.iconTextColor};
 `;
 
 function ProfileIcon({
@@ -16,7 +16,7 @@ function ProfileIcon({
   iconTextColor = 'white',
   iconText = '',
   ...otherProps
-}) {
+}: ProfileIconProps) {
   return (
     <StyledProfileIcon
       iconBg={iconBg}

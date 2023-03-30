@@ -1,6 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+interface TimelineReducerInitialState {
+  timelineState: TimelineStates;
+}
+
+const initialState: TimelineReducerInitialState = {
   timelineState: 'TIMELINE_VIEW',
 };
 

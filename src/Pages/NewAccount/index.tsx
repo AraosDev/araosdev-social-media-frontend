@@ -1,20 +1,27 @@
-import { useCreateAccountMutation } from 'api/apiSlice';
+/* eslint-disable import/order */
 import { useState } from 'react';
-import { createUserAccount } from 'Store/mutationTriggers/loginTriggers';
-import { Loader } from '../../Common/DataTransitionHandlers';
-import FormHeader from '../../Common/FormHeader';
-import '../Login/index.css';
+
+import { useCreateAccountMutation } from 'api/apiSlice';
+
 import AccountCreated from './AccountCreated';
 import CreateAccount from './CreateAccount';
 import ErrorView from './ErrorView';
 
-function NewAccount() {
+import '../Login/index.css';
+
+import { Loader } from 'Common/DataTransitionHandlers';
+import FormHeader from 'Common/FormHeader';
+import { createUserAccount } from 'Store/mutationTriggers/loginTriggers';
+
+function NewAccount(): React.ReactElement | null {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmPassword] = useState('');
-  const [phnNumber, setPhnNumber] = useState(null);
-  const [accountType, setAccountType] = useState(null);
+  const [phnNumber, setPhnNumber] =
+    useState<CreateAccountProps['phnNumber']>(null);
+  const [accountType, setAccountType] =
+    useState<CreateAccountProps['accountType']>(null);
   const [pwdError, setPwdError] = useState(false);
   const [view, setView] = useState('CREATE_ACCOUNT');
   const [errorType, setErrorType] = useState('');
@@ -32,7 +39,7 @@ function NewAccount() {
       };
       createUserAccount(createAccount, req, (state, errMsg) => {
         setView(state);
-        if (state === 'ERROR_VIEW') setErrorType(errMsg);
+        if (state === 'ERROR_VIEW' && errMsg) setErrorType(errMsg);
       });
     }
   };

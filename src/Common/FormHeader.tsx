@@ -1,7 +1,6 @@
-import React from 'react';
 import '../Pages/Login/index.css';
 
-function FormHeader({ hr = true, inline = false }) {
+function FormHeader({ hr = true, inline = false }: FormHeaderProps) {
   return (
     <>
       <h2 className="caveatBold">AraosDev</h2>

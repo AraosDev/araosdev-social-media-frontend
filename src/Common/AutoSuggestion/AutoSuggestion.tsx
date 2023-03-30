@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
+
 import { Loader } from '../DataTransitionHandlers';
 import { useDebounce } from '../helperFns';
 
 import './AutoSuggestion.css';
 
 function AutoSuggestion({
-  inputTypeProps = {},
+  inputTypeProps,
   totalList,
   loaderMsg = 'Searching...',
   onSearchKeyChange,
@@ -15,7 +16,7 @@ function AutoSuggestion({
   minLengthToShowSuggestion = 1,
   notEnoughTextLengthMsg = '',
   customListComponent,
-}) {
+}: AutoSuggestionProps): React.ReactElement {
   const {
     label = '',
     placeholder = '',
@@ -35,32 +36,34 @@ function AutoSuggestion({
 
   const filteredSuggestion = totalList;
 
-  const [activeValueId, setActiveValueId] = useState('');
+  const [activeValueId, setActiveValueId] = useState<number | null>(null);
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const { key } = event;
     if (key.toLowerCase() === 'arrowup') {
-      if (!activeValueId) setActiveValueId('');
+      if (!activeValueId) setActiveValueId(null);
       if (activeValueId) setActiveValueId(activeValueId - 1);
     }
     if (key.toLowerCase() === 'arrowdown') {
-      if (activeValueId === '') setActiveValueId(0);
+      if (activeValueId === null) setActiveValueId(0);
       else if (activeValueId === filteredSuggestion.length - 1) {
         setActiveValueId(0);
       } else setActiveValueId(activeValueId + 1);
     }
     if (key.toLowerCase() === 'enter') {
       event.preventDefault();
-      const { value } = filteredSuggestion[activeValueId];
-      onSuggestionClick(filteredSuggestion[activeValueId]);
-      setSearchKey(value);
-      setActiveValueId('');
-      setShowSuggestion(false);
+      if (activeValueId && Array.isArray(filteredSuggestion)) {
+        const { value } = filteredSuggestion[activeValueId];
+        onSuggestionClick(filteredSuggestion[activeValueId]);
+        setSearchKey(value);
+        setActiveValueId(null);
+        setShowSuggestion(false);
+      }
     }
   };
 
-  const onHoverList = ({ valueId, value }) => {
-    setActiveValueId('');
+  const onHoverList = ({ valueId, value }: valObj) => {
+    setActiveValueId(null);
     onSuggestionClick({ valueId, value });
     setSearchKey(value);
   };
@@ -113,7 +116,7 @@ function AutoSuggestion({
   };
 
   const debouncedSuggestionSearch = useDebounce(
-    (searchWords) => onSearchKeyChange(searchWords),
+    (searchWords: string) => onSearchKeyChange(searchWords),
     1000
   );
 
@@ -148,9 +151,9 @@ function AutoSuggestion({
           }}
           placeholder={placeholder || ''}
           name={name}
-          onBlur={(e) => {
+          onBlur={() => {
             setShowSuggestion(false);
-            setActiveValueId('');
+            setActiveValueId(null);
           }}
           onFocus={() => setShowSuggestion(true)}
           onKeyDown={handleKeyDown}

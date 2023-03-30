@@ -1,9 +1,11 @@
 import React from 'react';
-import '../Login/index.css';
 import { Button, Card, Form } from 'react-bootstrap';
+
 import FormHeader from '../../Common/FormHeader';
 
-function CreateAccount(props) {
+import '../Login/index.css';
+
+function CreateAccount(props: CreateAccountProps): React.ReactElement {
   const {
     userName,
     email,
@@ -77,7 +79,7 @@ function CreateAccount(props) {
                     type="text"
                     placeholder="Enter your Phone Number"
                     value={phnNumber || ''}
-                    onInput={(e) =>
+                    onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setPhnNumber(e.target.value.replace(/\D/, ''))
                     }
                   />
@@ -89,7 +91,9 @@ function CreateAccount(props) {
                   Account Type
                   <Form.Select
                     value={accountType || ''}
-                    onInput={(e) => setAccountType(e.target.value)}
+                    onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                      setAccountType(e.target.value)
+                    }
                   >
                     <option disabled>Please select account type</option>
                     <option>Private</option>

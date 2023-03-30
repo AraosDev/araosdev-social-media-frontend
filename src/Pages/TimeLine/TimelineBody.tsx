@@ -1,21 +1,26 @@
+/* eslint-disable import/order */
 /* eslint-disable no-underscore-dangle */
 import { useState } from 'react';
 import { Badge, Container, ListGroup, Tab, Tabs } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import styled from 'styled-components';
+
 import {
   useFriendRequestMutation,
   useGetTimeLineImgsQuery,
   useUpdateCommentMutation,
   useUpdateLikeCountMutation,
 } from 'api/apiSlice';
-import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+import styled from 'styled-components';
+
 import { Loader } from '../../Common/DataTransitionHandlers';
-import { didCurrentUserLiked } from './HelperFns';
-import TimelinePostCard from '../../Common/TimelinePostCard';
-import ProfileIcon from '../../Common/ProfileIcon';
 import { currentUser, currentUserInfo } from '../../Common/helperFns';
+import ProfileIcon from '../../Common/ProfileIcon';
+import TimelinePostCard from '../../Common/TimelinePostCard';
+
 import MessageView from './Components/MessageView';
+import { didCurrentUserLiked } from './HelperFns';
+
+import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+import { useAppSelector } from 'Store/store/hooks';
 
 const StyledTimelineBody = styled.div`
   max-height: calc(100vh - 85px);
@@ -60,24 +65,31 @@ const StyledTimelineBody = styled.div`
   }
 `;
 
-function TimelineBody() {
+function TimelineBody(): React.ReactElement {
   const { isFetching, isSuccess, data } = useGetTimeLineImgsQuery(
     currentUser()
   );
   const [updateLikeCountFn] = useUpdateLikeCountMutation();
   const [updateCommentFn] = useUpdateCommentMutation();
   const [friendReqtTrigger] = useFriendRequestMutation();
-  const { timelineState } = useSelector((state) => state.timelineReducer);
+  const { timelineState } = useAppSelector((state) => state.timelineReducer);
 
-  const { friends, friendRequests = {} } = currentUserInfo();
+  const { friends, friendRequests } = currentUserInfo() as UserInfo;
   const { requestedTo, requestedBy } = friendRequests;
 
-  const [openedCommentSectImgs, setOpenCommentSecImgs] = useState([]);
-  const [newCommentInImgs, setNewCommentInImgs] = useState([]);
-  const [frndReqState, setFrndReqState] = useState([]);
-  const [frndReqTab, setFrndReqTab] = useState('My Friends');
+  const [openedCommentSectImgs, setOpenCommentSecImgs] = useState<string[]>([]);
+  const [newCommentInImgs, setNewCommentInImgs] = useState<
+    { id: string; comment: string }[]
+  >([]);
+  const [frndReqState, setFrndReqState] = useState<
+    { friend: string; state: string }[]
+  >([]);
+  const [frndReqTab, setFrndReqTab] = useState<string>('My Friends');
 
-  const updateLikeCount = (imgDetail, flag) => {
+  const updateLikeCount = (
+    imgDetail: TransformedTimelineImgRes,
+    flag: UpdateLikeReqBody['likedFlag']
+  ) => {
     const reqBody = {
       postName: imgDetail.image,
       postedBy: imgDetail.userName,
@@ -87,7 +99,7 @@ function TimelineBody() {
     updateLikeCountFn(reqBody).unwrap();
   };
 
-  const openCommentSection = (imgDetail) => {
+  const openCommentSection = (imgDetail: TransformedTimelineImgRes) => {
     const { _id } = imgDetail;
     if (openedCommentSectImgs.includes(_id)) {
       setOpenCommentSecImgs([
@@ -96,8 +108,9 @@ function TimelineBody() {
     } else setOpenCommentSecImgs([...openedCommentSectImgs, _id]);
   };
 
-  const updateComment = (imgDetail) => {
-    const { comment } = newCommentInImgs.find(({ id }) => imgDetail._id === id);
+  const updateComment = (imgDetail: TransformedTimelineImgRes) => {
+    const { comment = '' } =
+      newCommentInImgs.find(({ id }) => imgDetail._id === id) || {};
     if (comment) {
       const reqBody = {
         postName: imgDetail.image,
@@ -114,15 +127,18 @@ function TimelineBody() {
     }
   };
 
-  const getCurrentCommentValue = (imgDetail) => {
+  const getCurrentCommentValue = (imgDetail: TransformedTimelineImgRes) => {
     const { comment = '' } =
       newCommentInImgs.find(({ id }) => imgDetail._id === id) || {};
     if (comment) return comment;
     return '';
   };
 
-  const handleUserFrndRelations = (friend, requestType) => {
-    let reqBody = { friend, requestType };
+  const handleUserFrndRelations = (
+    friend: string,
+    requestType: frndRequestReq['requestType']
+  ) => {
+    let reqBody: frndRequestReq = { friend, requestType };
     if (requestType === 'ACCEPT_REQ' || requestType === 'REJECT_REQ') {
       reqBody = {
         friend: currentUser(),
@@ -133,10 +149,10 @@ function TimelineBody() {
     friendRequestTrigger(friendReqtTrigger, reqBody, (state) => {
       const existingStates = [...frndReqState];
       const currentFrndReqState = existingStates.find(
-        ({ frnd }) => friend === frnd
+        ({ friend: frnd }) => friend === frnd
       );
       const currentFrndReqStateIndex = existingStates.findIndex(
-        ({ frnd }) => friend === frnd
+        ({ friend: frnd }) => friend === frnd
       );
       if (currentFrndReqState) {
         const newState = {
@@ -217,7 +233,7 @@ function TimelineBody() {
       return (
         <Tabs
           activeKey={frndReqTab}
-          onSelect={(k) => setFrndReqTab(k)}
+          onSelect={(k) => setFrndReqTab(k || '')}
           className="py-3"
         >
           <Tab eventKey="My Friends" title="My Friends">
@@ -244,7 +260,7 @@ function TimelineBody() {
                           frndReqState.find(({ friend }) => friend === frnd) &&
                           frndReqState
                             .find(({ friend }) => friend === frnd)
-                            .state.includes('LOADING')
+                            ?.state.includes('LOADING')
                         )
                           return;
                         handleUserFrndRelations(frnd, 'REMOVE_FRIEND');
@@ -253,7 +269,7 @@ function TimelineBody() {
                       {frndReqState.find(({ friend }) => friend === frnd) &&
                       frndReqState
                         .find(({ friend }) => friend === frnd)
-                        .state.includes('LOADING')
+                        ?.state.includes('LOADING')
                         ? 'Removing Friend'
                         : 'Remove Friend'}
                     </Badge>
@@ -263,101 +279,99 @@ function TimelineBody() {
             </div>
           </Tab>
           <Tab eventKey="Friend Requests" title="Friend Requests">
-            {requestedBy.map((frnd) => (
-              <ListGroup.Item
-                key={frnd}
-                className="d-flex align-items-center justify-content-between"
-                style={{ borderRadius: 0 }}
-              >
-                <div className="d-flex align-items-center">
-                  <ProfileIcon
-                    className="mx-2"
-                    iconText={frnd.charAt(0).toUpperCase()}
-                  />
-                  {frnd}
-                </div>
-                <div className="d-flex">
-                  <Badge
-                    className="cursor-pointer me-2"
-                    text="dark"
-                    onClick={() => {
-                      if (
-                        frndReqState.find(({ friend }) => friend === frnd) &&
-                        frndReqState
-                          .find(({ friend }) => friend === frnd)
-                          .state.includes('LOADING')
-                      )
-                        return;
-                      handleUserFrndRelations(frnd, 'ACCEPT_REQ');
-                    }}
-                  >
-                    {frndReqState.find(({ friend }) => friend === frnd) &&
-                    frndReqState.find(({ friend }) => friend === frnd).state ===
-                      'ACCEPT_REQ_LOADING'
-                      ? 'Accepting Request'
-                      : frndReqState.find(({ friend }) => friend === frnd) &&
-                        frndReqState.find(({ friend }) => friend === frnd)
-                          .state === 'REJECT_REQ_LOADING'
-                      ? 'Rejecting Request'
-                      : 'Accept Request'}
-                  </Badge>
-                  {!(
-                    frndReqState.find(({ friend }) => friend === frnd) &&
-                    frndReqState
-                      .find(({ friend }) => friend === frnd)
-                      .state.includes('LOADING')
-                  ) && (
+            {requestedBy.map((frnd) => {
+              const currentFrndReq = frndReqState.find(
+                ({ friend }) => friend === frnd
+              ) || { state: '' };
+              return (
+                <ListGroup.Item
+                  key={frnd}
+                  className="d-flex align-items-center justify-content-between"
+                  style={{ borderRadius: 0 }}
+                >
+                  <div className="d-flex align-items-center">
+                    <ProfileIcon
+                      className="mx-2"
+                      iconText={frnd.charAt(0).toUpperCase()}
+                    />
+                    {frnd}
+                  </div>
+                  <div className="d-flex">
                     <Badge
                       className="cursor-pointer me-2"
                       text="dark"
-                      onClick={() =>
-                        handleUserFrndRelations(frnd, 'REJECT_REQ')
-                      }
+                      onClick={() => {
+                        if (
+                          currentFrndReq &&
+                          currentFrndReq.state.includes('LOADING')
+                        )
+                          return;
+                        handleUserFrndRelations(frnd, 'ACCEPT_REQ');
+                      }}
                     >
-                      Reject Request
+                      {currentFrndReq &&
+                      currentFrndReq.state === 'ACCEPT_REQ_LOADING'
+                        ? 'Accepting Request'
+                        : currentFrndReq &&
+                          currentFrndReq.state === 'REJECT_REQ_LOADING'
+                        ? 'Rejecting Request'
+                        : 'Accept Request'}
                     </Badge>
-                  )}
-                </div>
-              </ListGroup.Item>
-            ))}
+                    {!(
+                      currentFrndReq && currentFrndReq.state.includes('LOADING')
+                    ) && (
+                      <Badge
+                        className="cursor-pointer me-2"
+                        text="dark"
+                        onClick={() =>
+                          handleUserFrndRelations(frnd, 'REJECT_REQ')
+                        }
+                      >
+                        Reject Request
+                      </Badge>
+                    )}
+                  </div>
+                </ListGroup.Item>
+              );
+            })}
           </Tab>
           <Tab eventKey="Friend Requested Sent" title="Friend Request Sent">
-            {requestedTo.map((frnd) => (
-              <ListGroup.Item
-                key={frnd}
-                className="d-flex align-items-center justify-content-between"
-                style={{ borderRadius: 0 }}
-              >
-                <div className="d-flex align-items-center">
-                  <ProfileIcon
-                    className="mx-2"
-                    iconText={frnd.charAt(0).toUpperCase()}
-                  />
-                  {frnd}
-                </div>
-                <Badge
-                  className="cursor-pointer"
-                  text="dark"
-                  onClick={() => {
-                    if (
-                      frndReqState.find(({ friend }) => friend === frnd) &&
-                      frndReqState
-                        .find(({ friend }) => friend === frnd)
-                        .state.includes('LOADING')
-                    )
-                      return;
-                    handleUserFrndRelations(frnd, 'REVOKE_REQ');
-                  }}
+            {requestedTo.map((frnd) => {
+              const currentFrndReq = frndReqState.find(
+                ({ friend }) => friend === frnd
+              ) || { state: '' };
+              return (
+                <ListGroup.Item
+                  key={frnd}
+                  className="d-flex align-items-center justify-content-between"
+                  style={{ borderRadius: 0 }}
                 >
-                  {frndReqState.find(({ friend }) => friend === frnd) &&
-                  frndReqState
-                    .find(({ friend }) => friend === frnd)
-                    .state.includes('LOADING')
-                    ? 'Revoking Request'
-                    : 'Revoke Request'}
-                </Badge>
-              </ListGroup.Item>
-            ))}
+                  <div className="d-flex align-items-center">
+                    <ProfileIcon
+                      className="mx-2"
+                      iconText={frnd.charAt(0).toUpperCase()}
+                    />
+                    {frnd}
+                  </div>
+                  <Badge
+                    className="cursor-pointer"
+                    text="dark"
+                    onClick={() => {
+                      if (
+                        currentFrndReq &&
+                        currentFrndReq.state.includes('LOADING')
+                      )
+                        return;
+                      handleUserFrndRelations(frnd, 'REVOKE_REQ');
+                    }}
+                  >
+                    {currentFrndReq && currentFrndReq.state.includes('LOADING')
+                      ? 'Revoking Request'
+                      : 'Revoke Request'}
+                  </Badge>
+                </ListGroup.Item>
+              );
+            })}
           </Tab>
         </Tabs>
       );

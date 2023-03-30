@@ -63,3 +63,28 @@ interface UpdateCommentRes {
     }>;
   };
 }
+
+interface TimelinePostCardProps {
+  cardClassName: string;
+  cardStyle?: React.CSSProperties;
+  imagePostedBy: string;
+  imagePostedOn: string;
+  imgcaption: string;
+  imgSrc: string;
+  commentType: 'normal' | 'custom' | 'none';
+  didCurrentUserLiked: boolean;
+  updateLikeCount: (flag: UpdateLikeReqBody['likedFlag']) => void;
+  imgLikes: string | number;
+  openCommentSection?: () => void;
+  commentSection: TimelineImages['commentSection'];
+  shouldOpenCommentSection?: boolean;
+  commentSectionClass?: string;
+  customCommentComponent?: () => React.ReactElement | JSX.Element | null;
+  includeAddNewComment?: boolean;
+  newComment?: string;
+  newCommentChangeHandler?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  postNewCommentHandler?: (e: React.MouseEvent<HTMLElement>) => void;
+  noImgAvailableText?: string;
+}
+
+type TimelineStates = 'TIMELINE_VIEW' | 'FRIEND_LIST_VIEW' | 'MESSAGE_VIEW';

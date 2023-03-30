@@ -1,7 +1,7 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
 import { Badge, Card, Form, ListGroup } from 'react-bootstrap';
 import { BsChat, BsFillHeartFill, BsHeart } from 'react-icons/bs';
+
 import { currentUser, unixTimeToReadableFormat } from './helperFns';
 import ProfileIcon from './ProfileIcon';
 
@@ -27,7 +27,7 @@ function TimelinePostCard({
   postNewCommentHandler,
   noImgAvailableText = '',
   ...cardProps
-}) {
+}: TimelinePostCardProps) {
   return (
     <Card className={cardClassName} style={cardStyle} {...cardProps}>
       <Card.Header className="d-flex">
@@ -140,15 +140,13 @@ function TimelinePostCard({
                   </Badge>
                 </div>
               </ListGroup.Item>
-            ) : (
-              <></>
-            )}
+            ) : null}
           </ListGroup>
         ) : shouldOpenCommentSection && commentType === 'custom' ? (
-          <>{customCommentComponent()}</>
-        ) : (
-          <></>
-        )}
+          typeof customCommentComponent === 'function' ? (
+            customCommentComponent()
+          ) : null
+        ) : null}
       </Card.Footer>
     </Card>
   );
