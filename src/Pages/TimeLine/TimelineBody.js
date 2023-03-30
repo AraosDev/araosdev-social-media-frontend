@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Badge, Container, ListGroup, Tab, Tabs } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -9,12 +9,12 @@ import {
   useUpdateCommentMutation,
   useUpdateLikeCountMutation,
 } from 'api/apiSlice';
+import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
 import { Loader } from '../../Common/DataTransitionHandlers';
 import { didCurrentUserLiked } from './HelperFns';
 import TimelinePostCard from '../../Common/TimelinePostCard';
 import ProfileIcon from '../../Common/ProfileIcon';
 import { currentUser, currentUserInfo } from '../../Common/helperFns';
-// import { friendRequestAction } from '../../Store/actions/frndRequestsActions';
 import MessageView from './Components/MessageView';
 
 const StyledTimelineBody = styled.div`
@@ -61,14 +61,12 @@ const StyledTimelineBody = styled.div`
 `;
 
 function TimelineBody() {
-  // const dispatch = useDispatch();
   const { isFetching, isSuccess, data } = useGetTimeLineImgsQuery(
     currentUser()
   );
   const [updateLikeCountFn] = useUpdateLikeCountMutation();
   const [updateCommentFn] = useUpdateCommentMutation();
-  const [friendRequestTrigger, { isLoading: isFrndReqLoading }] =
-    useFriendRequestMutation();
+  const [friendReqtTrigger] = useFriendRequestMutation();
   const { timelineState } = useSelector((state) => state.timelineReducer);
 
   const { friends, friendRequests = {} } = currentUserInfo();
@@ -132,58 +130,23 @@ function TimelineBody() {
         requestType,
       };
     }
-    const existingStates = [...frndReqState];
-    const currentFrndReqState = existingStates.find(
-      ({ frnd }) => friend === frnd
-    );
-    const currentFrndReqStateIndex = existingStates.findIndex(
-      ({ frnd }) => friend === frnd
-    );
-    if (isFrndReqLoading && currentFrndReqState) {
-      const newState = {
-        ...currentFrndReqState,
-        state: `${requestType}_LOADING`,
-      };
-      existingStates.splice(currentFrndReqStateIndex, 1, newState);
-    } else existingStates.push({ friend, state: `${requestType}_LOADING` });
-    setFrndReqState(existingStates);
-    friendRequestTrigger(reqBody)
-      .unwrap()
-      .then((res) => {
-        const newCurrentFrndReqState = existingStates.find(
-          ({ frnd }) => friend === frnd
-        );
-        const newCurrentFrndReqStateIndex = existingStates.findIndex(
-          ({ frnd }) => friend === frnd
-        );
-        if (newCurrentFrndReqState) {
-          const newState = {
-            ...newCurrentFrndReqState,
-            state: `${requestType}_${res}`,
-          };
-          existingStates.splice(newCurrentFrndReqStateIndex, 1, newState);
-        } else existingStates.push({ friend, state: `${requestType}_${res}` });
-        setFrndReqState(existingStates);
-      });
-    /* dispatch(
-      friendRequestAction(reqBody, (state) => {
-        const newCurrentFrndReqState = existingStates.find(
-          ({ frnd }) => friend === frnd
-        );
-        const newCurrentFrndReqStateIndex = existingStates.findIndex(
-          ({ frnd }) => friend === frnd
-        );
-        if (newCurrentFrndReqState) {
-          const newState = {
-            ...newCurrentFrndReqState,
-            state: `${requestType}_${state}`,
-          };
-          existingStates.splice(newCurrentFrndReqStateIndex, 1, newState);
-        } else
-          existingStates.push({ friend, state: `${requestType}_${state}` });
-        setFrndReqState(existingStates);
-      })
-    ); */
+    friendRequestTrigger(friendReqtTrigger, reqBody, (state) => {
+      const existingStates = [...frndReqState];
+      const currentFrndReqState = existingStates.find(
+        ({ frnd }) => friend === frnd
+      );
+      const currentFrndReqStateIndex = existingStates.findIndex(
+        ({ frnd }) => friend === frnd
+      );
+      if (currentFrndReqState) {
+        const newState = {
+          ...currentFrndReqState,
+          state: `${requestType}_${state}`,
+        };
+        existingStates.splice(currentFrndReqStateIndex, 1, newState);
+      } else existingStates.push({ friend, state: `${requestType}_${state}` });
+      setFrndReqState(existingStates);
+    });
   };
 
   const getTimelineContent = () => {

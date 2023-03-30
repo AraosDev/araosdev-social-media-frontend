@@ -1,25 +1,23 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 const initialState = {
-  timelineImages: [],
-  timelineState: 'TIMELINE_LOADING',
+  timelineState: 'TIMELINE_VIEW',
 };
 
-const timelineReducer = (state = initialState, action) => {
-  let newState = { ...state };
+const timelineReducer = createSlice({
+  name: 'timelineReducer',
+  initialState,
+  reducers: {
+    setTimelineState(state, action) {
+      const newState = { ...state };
+      newState.timelineState = action.payload;
+      return newState;
+    },
+  },
+});
 
-  switch (action.type) {
-    case 'SET_TIMELINE': {
-      newState.timelineImages = action.payload.images;
-      newState.timelineState = action.payload.state;
-      break;
-    }
+const { actions, reducer } = timelineReducer;
 
-    default: {
-      newState = { ...state };
-      break;
-    }
-  }
+export const { setTimelineState } = actions;
 
-  return newState;
-};
-
-export default timelineReducer;
+export default reducer;

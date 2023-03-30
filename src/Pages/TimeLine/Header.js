@@ -2,16 +2,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {
   useFriendRequestMutation,
-  useGetTimeLineImgsQuery,
   usePostTimelineImgMutation,
   useSearchFriendListQuery,
 } from 'api/apiSlice';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Badge, Dropdown, Form } from 'react-bootstrap';
 import { BsPlusSquare, BsXLg } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+import { postImageInTimeline } from 'Store/mutationTriggers/timelineTrigger';
+import { setTimelineState } from 'Store/reducer/timelineReducer';
 import styled from 'styled-components';
 import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
 import { Loader } from '../../Common/DataTransitionHandlers';
@@ -20,7 +22,6 @@ import { currentUser, unixTimeToReadableFormat } from '../../Common/helperFns';
 import ModalComp from '../../Common/ModalComp';
 import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
-import { setTimeline } from '../../Store/actions/timelineActions';
 import { frndUserRelation } from './HelperFns';
 
 const StyledTimeLineHeader = styled.div`
@@ -54,7 +55,6 @@ function TimeLineHeader() {
   const { timelineState } = useSelector((state) => state.timelineReducer);
 
   const [selectedFrnd, setSelectedFrnd] = useState('');
-  // const [frndSuggestions, setFrndSuggestions] = useState([]);
   const [frndReqState, setFrndReqState] = useState([]);
   const [openAddPostModal, setOpenAddPostModal] = useState(false);
   const [postedImg, setPostedImg] = useState(null);
@@ -63,16 +63,14 @@ function TimeLineHeader() {
   const [openProfileDrpDwn, setOpenProfileDrpDwn] = useState(false);
   const [debouncedSearchKey, setDebouncedSearchKey] = useState('');
 
-  const { data: timelineImages } = useGetTimeLineImgsQuery(userName);
   const [postImage, { isLoading }] = usePostTimelineImgMutation();
   const {
     data: frndSuggestions,
-    isLoading: isFrndSuggestionLoading,
+    isFetching: isFrndSuggestionLoading,
     isError: isFrndSuggestionErr,
     error: frndSuggestionErr,
   } = useSearchFriendListQuery(debouncedSearchKey);
-  const [friendRequestTrigger, { isLoading: isFrndReqLoading }] =
-    useFriendRequestMutation();
+  const [friendReqtTrigger] = useFriendRequestMutation();
 
   const frndUserRelationChange = (frnd, label, event) => {
     if (event) {
@@ -93,44 +91,24 @@ function TimeLineHeader() {
         user: frnd,
       };
     }
-    const { requestType } = reqBody;
-    const existingStates = [...frndReqState];
-    const currentFrndReqState = existingStates.find(
-      ({ frnd: friend }) => friend === frnd
-    );
-    const currentFrndReqStateIndex = existingStates.findIndex(
-      ({ frnd: friend }) => friend === frnd
-    );
-    if (isFrndReqLoading && currentFrndReqState) {
-      const newState = {
-        ...currentFrndReqState,
-        state: `${requestType}_LOADING`,
-      };
-      existingStates.splice(currentFrndReqStateIndex, 1, newState);
-    } else existingStates.push({ frnd, state: `${requestType}_LOADING` });
-    setFrndReqState(existingStates);
-    friendRequestTrigger(reqBody)
-      .unwrap()
-      .then((res) => {
-        if (event) {
-          event.stopPropagation();
-          event.preventDefault();
-        }
-        const newCurrentFrndReqState = existingStates.find(
-          ({ frnd: friend }) => friend === frnd
-        );
-        const newCurrentFrndReqStateIndex = existingStates.findIndex(
-          ({ frnd: friend }) => friend === frnd
-        );
-        if (newCurrentFrndReqState) {
-          const newState = {
-            ...newCurrentFrndReqState,
-            state: `${requestType}_${res}`,
-          };
-          existingStates.splice(newCurrentFrndReqStateIndex, 1, newState);
-        } else existingStates.push({ frnd, state: `${requestType}_${res}` });
-        setFrndReqState(existingStates);
-      });
+    friendRequestTrigger(friendReqtTrigger, { ...reqBody, event }, (state) => {
+      const { requestType } = reqBody;
+      const existingStates = [...frndReqState];
+      const currentFrndReqState = existingStates.find(
+        ({ frnd: friend }) => friend === frnd
+      );
+      const currentFrndReqStateIndex = existingStates.findIndex(
+        ({ frnd: friend }) => friend === frnd
+      );
+      if (currentFrndReqState) {
+        const newState = {
+          ...currentFrndReqState,
+          state: `${requestType}_${state}`,
+        };
+        existingStates.splice(currentFrndReqStateIndex, 1, newState);
+      } else existingStates.push({ frnd, state: `${requestType}_${state}` });
+      setFrndReqState(existingStates);
+    });
   };
 
   const getFrndRelationBadgeLabel = (frnd) => {
@@ -199,24 +177,23 @@ function TimeLineHeader() {
     const { name } = postedImg;
     const supportedImgFormats = ['jpg', 'jpeg', 'png'];
     if (supportedImgFormats.includes(name.split('.').pop().toLowerCase())) {
-      if (isLoading) setPostImgState('LOADING');
-      postImage({
-        file: postedImg,
-        caption: postedImgCaption,
-        username: userName,
-      })
-        .unwrap()
-        .then(() => closeModal())
-        .catch(() => setPostImgState('ERROR'));
+      postImageInTimeline(
+        postImage,
+        {
+          file: postedImg,
+          caption: postedImgCaption,
+          username: userName,
+        },
+        (state) => {
+          if (state === 'SUCCESS') closeModal();
+          else setPostImgState(state);
+        }
+      );
     }
   };
 
   const switchViews = (view) => {
-    const newTimelineState = {
-      state: view,
-      images: timelineImages,
-    };
-    dispatch(setTimeline(newTimelineState));
+    dispatch(setTimelineState(view));
     setOpenProfileDrpDwn(false);
   };
 
@@ -361,18 +338,16 @@ function TimeLineHeader() {
           align="end"
           style={{ top: 60, right: 50 }}
         >
-          <Dropdown.Item
-            onClick={() => {
-              const view =
-                timelineState !== 'FRIEND_LIST_VIEW' &&
-                timelineState !== 'MESSAGE_VIEW'
-                  ? 'FRIEND_LIST_VIEW'
-                  : 'TIMELINE_LOADED';
-              switchViews(view);
-            }}
-          >
-            {timelineState !== 'FRIEND_LIST_VIEW' ? 'My Friends' : 'Timeline'}
-          </Dropdown.Item>
+          {timelineState !== 'TIMELINE_VIEW' ? (
+            <Dropdown.Item onClick={() => switchViews('TIMELINE_VIEW')}>
+              My Timeline
+            </Dropdown.Item>
+          ) : null}
+          {timelineState !== 'FRIEND_LIST_VIEW' ? (
+            <Dropdown.Item onClick={() => switchViews('FRIEND_LIST_VIEW')}>
+              My Friends
+            </Dropdown.Item>
+          ) : null}
           {timelineState !== 'MESSAGE_VIEW' ? (
             <Dropdown.Item onClick={() => switchViews('MESSAGE_VIEW')}>
               Messages

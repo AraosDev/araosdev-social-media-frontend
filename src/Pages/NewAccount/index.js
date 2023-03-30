@@ -1,5 +1,6 @@
 import { useCreateAccountMutation } from 'api/apiSlice';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { createUserAccount } from 'Store/mutationTriggers/loginTriggers';
 import { Loader } from '../../Common/DataTransitionHandlers';
 import FormHeader from '../../Common/FormHeader';
 import '../Login/index.css';
@@ -17,8 +18,7 @@ function NewAccount() {
   const [pwdError, setPwdError] = useState(false);
   const [view, setView] = useState('CREATE_ACCOUNT');
   const [errorType, setErrorType] = useState('');
-  const [createAccount, { isLoading, isError, isSuccess }] =
-    useCreateAccountMutation();
+  const [createAccount] = useCreateAccountMutation();
 
   const onCreateAccount = () => {
     if (password !== confirmpassword) {
@@ -30,24 +30,10 @@ function NewAccount() {
         email,
         phonenumber: phnNumber,
       };
-      if (isLoading) setView('LOADING');
-      createAccount(req)
-        .unwrap()
-        .then((res) => {
-          if (isLoading) setView('LOADING');
-          else if (res.status === 400 && res.updated === 'FAILED') {
-            setErrorType(res.message.toUpperCase());
-            setView('ERROR_VIEW');
-          } else if (isSuccess && res.status === 200 && res.updated === 'OK') {
-            setView('ACCOUNT_CREATED');
-          }
-        })
-        .catch((errRes) => {
-          if (isError) {
-            setErrorType(errRes.message.toUpperCase());
-            setView('ERROR_VIEW');
-          }
-        });
+      createUserAccount(createAccount, req, (state, errMsg) => {
+        setView(state);
+        if (state === 'ERROR_VIEW') setErrorType(errMsg);
+      });
     }
   };
 

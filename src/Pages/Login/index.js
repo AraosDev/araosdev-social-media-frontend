@@ -1,26 +1,26 @@
 import { useLoggedInUserInfoMutation } from 'api/apiSlice';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, Button, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { getLoggedInUserInfo } from 'Store/mutationTriggers/loginTriggers';
 import './index.css';
 
 function Login() {
   const navigate = useNavigate();
-  const [getLoggedInUserInfo] = useLoggedInUserInfoMutation();
+  const [loggedInUserInfo] = useLoggedInUserInfoMutation();
 
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
   const onLogin = () => {
-    getLoggedInUserInfo({ username: userName, password })
-      .unwrap()
-      .then((res) => {
-        const { credentialsVerified: isVerified, status } = res;
-        if (isVerified === 'OK' && status === 200) {
-          navigate('/timeline', { replace: true });
-        }
-      })
-      .catch(() => alert('Login Failed !!'));
+    getLoggedInUserInfo(
+      loggedInUserInfo,
+      { username: userName, password },
+      (state) => {
+        if (state === 'SUCCESS') navigate('/timeline', { replace: true });
+        else if (state === 'ERROR') alert('Login Failed !!');
+      }
+    );
   };
 
   return (
