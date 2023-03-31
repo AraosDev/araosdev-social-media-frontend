@@ -6,11 +6,6 @@ import { Badge, Dropdown, Form } from 'react-bootstrap';
 import { BsPlusSquare, BsXLg } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  useFriendRequestMutation,
-  usePostTimelineImgMutation,
-  useSearchFriendListQuery,
-} from 'api/apiSlice';
 import styled from 'styled-components';
 
 import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
@@ -23,6 +18,11 @@ import TimelinePostCard from '../../Common/TimelinePostCard';
 
 import { frndUserRelation } from './HelperFns';
 
+import {
+  useFriendRequestMutation,
+  usePostTimelineImgMutation,
+  useSearchFriendListQuery,
+} from 'Store/apiSlices/mainAPISlice';
 import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
 import { postImageInTimeline } from 'Store/mutationTriggers/timelineTrigger';
 import { setTimelineState } from 'Store/reducer/timelineReducer';
@@ -221,9 +221,7 @@ function TimeLineHeader(): React.ReactElement {
         header="Add your post"
         bodyClass="d-flex flex-column"
         proceedValidation={
-          Boolean(postedImg) &&
-          Boolean(postedImgCaption) &&
-          !Boolean(postImgState)
+          Boolean(postedImg) && Boolean(postedImgCaption) && !postImgState
         }
         proceedHandler={postTimelineImage}
         validationMsg={

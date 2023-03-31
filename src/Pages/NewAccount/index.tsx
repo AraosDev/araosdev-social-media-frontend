@@ -1,8 +1,6 @@
 /* eslint-disable import/order */
 import { useState } from 'react';
 
-import { useCreateAccountMutation } from 'api/apiSlice';
-
 import AccountCreated from './AccountCreated';
 import CreateAccount from './CreateAccount';
 import ErrorView from './ErrorView';
@@ -11,6 +9,7 @@ import '../Login/index.css';
 
 import { Loader } from 'Common/DataTransitionHandlers';
 import FormHeader from 'Common/FormHeader';
+import { useCreateAccountMutation } from 'Store/apiSlices/mainAPISlice';
 import { createUserAccount } from 'Store/mutationTriggers/loginTriggers';
 
 function NewAccount(): React.ReactElement | null {

@@ -3,12 +3,6 @@
 import { useState } from 'react';
 import { Badge, Container, ListGroup, Tab, Tabs } from 'react-bootstrap';
 
-import {
-  useFriendRequestMutation,
-  useGetTimeLineImgsQuery,
-  useUpdateCommentMutation,
-  useUpdateLikeCountMutation,
-} from 'api/apiSlice';
 import styled from 'styled-components';
 
 import { Loader } from '../../Common/DataTransitionHandlers';
@@ -19,6 +13,12 @@ import TimelinePostCard from '../../Common/TimelinePostCard';
 import MessageView from './Components/MessageView';
 import { didCurrentUserLiked } from './HelperFns';
 
+import {
+  useFriendRequestMutation,
+  useGetTimeLineImgsQuery,
+  useUpdateCommentMutation,
+  useUpdateLikeCountMutation,
+} from 'Store/apiSlices/mainAPISlice';
 import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
 import { useAppSelector } from 'Store/store/hooks';
 

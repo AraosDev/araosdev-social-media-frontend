@@ -1,7 +1,6 @@
-import { adsmApiSlice } from 'api/apiSlice';
-
 import { configureStore } from '@reduxjs/toolkit';
 
+import { adsmApiSlice } from 'Store/apiSlices/mainAPISlice';
 import timelineReducer from 'Store/reducer/timelineReducer';
 
 const store = configureStore({

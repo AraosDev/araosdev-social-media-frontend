@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useLoggedInUserInfoMutation } from 'api/apiSlice';
-
 import './index.css';
 
+import { useLoggedInUserInfoMutation } from 'Store/apiSlices/mainAPISlice';
 import { getLoggedInUserInfo } from 'Store/mutationTriggers/loginTriggers';
 
 function Login(): React.ReactElement {
