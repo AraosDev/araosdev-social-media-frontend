@@ -171,6 +171,10 @@ function TimeLineHeader(): React.ReactElement {
   };
 
   const onCaptureUploadedImg = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = new File([':)'], 'profile-pic (2).jpg', {
+      type: 'image/jpeg',
+    });
+    console.log(file);
     if (e.target.files && e.target.files.length) {
       setPostedImg(e.target.files[0]);
     }
@@ -212,6 +216,9 @@ function TimeLineHeader(): React.ReactElement {
     setOpenProfileDrpDwn(false);
   };
 
+  if (postedImg !== null)
+    console.log(URL.createObjectURL(postedImg), postedImg);
+
   return (
     <StyledTimeLineHeader>
       <ModalComp
@@ -247,6 +254,7 @@ function TimeLineHeader(): React.ReactElement {
                 <div className="d-flex mb-3 align-items-center">
                   <Form.Control
                     ref={postedImgRef}
+                    data-testid="post-image-input"
                     type="file"
                     className="me-2"
                     onChange={onCaptureUploadedImg}
@@ -256,6 +264,7 @@ function TimeLineHeader(): React.ReactElement {
                       setPostedImg(null);
                       postedImgRef.current = null;
                     }}
+                    data-testid="post-image-clear"
                     className="cursor-pointer"
                   />
                 </div>
@@ -340,6 +349,7 @@ function TimeLineHeader(): React.ReactElement {
       >
         <BsPlusSquare
           className="me-3 cursor-pointer"
+          data-testid="add-post"
           color="#1c1950"
           size={25}
           title="Add Post"

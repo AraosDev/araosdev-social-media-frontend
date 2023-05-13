@@ -32,7 +32,7 @@ export const getLoggedInUserInfo = (
       const { credentialsVerified: isVerified, status } = res;
       if (isVerified === 'OK' && status === 200) {
         captureTriggerStatus('SUCCESS');
-      }
+      } else captureTriggerStatus('ERROR');
     })
     .catch(() => captureTriggerStatus('ERROR'));
 };
@@ -54,7 +54,10 @@ export const createUserAccount = (
     >
   >,
   reqBody: CreateAccountPayload,
-  captureTriggerStatus: (state: string, errMessage?: string) => void
+  captureTriggerStatus: (
+    state: CreateAccountStates,
+    errMessage?: string
+  ) => void
 ) => {
   if (captureTriggerStatus) captureTriggerStatus('LOADING');
   trigger(reqBody)

@@ -25,7 +25,7 @@ interface TransformedTimelineImgRes extends TimelineImages {
 
 interface PostTimelineImgPayload {
   username: TimelineImages['userName'];
-  file: Blob;
+  file: File;
   caption: string;
 }
 

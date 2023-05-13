@@ -12,9 +12,11 @@ import {
   updateLikeCountTransformer,
 } from 'Store/transformers/timelineTransformer';
 
+export const appApiBaseURL = 'http://localhost:5000/araosdevsm/';
+
 export const adsmApiSlice = createApi({
   reducerPath: 'adsmMainReducer',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5000/araosdevsm/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: appApiBaseURL }),
   tagTypes: ['UPDATE_TIMELINE'],
   endpoints: (builder) => ({
     // Getting logged in user details

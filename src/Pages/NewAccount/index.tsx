@@ -9,64 +9,29 @@ import '../Login/index.css';
 
 import { Loader } from 'Common/DataTransitionHandlers';
 import FormHeader from 'Common/FormHeader';
-import { useCreateAccountMutation } from 'Store/apiSlices/mainAPISlice';
-import { createUserAccount } from 'Store/mutationTriggers/loginTriggers';
+import { setCreateAccountState } from 'Store/reducer/timelineReducer';
+import { useAppDispatch, useAppSelector } from 'Store/store/hooks';
 
 function NewAccount(): React.ReactElement | null {
-  const [userName, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmpassword, setConfirmPassword] = useState('');
-  const [phnNumber, setPhnNumber] =
-    useState<CreateAccountProps['phnNumber']>(null);
-  const [accountType, setAccountType] =
-    useState<CreateAccountProps['accountType']>(null);
-  const [pwdError, setPwdError] = useState(false);
-  const [view, setView] = useState('CREATE_ACCOUNT');
+  const { createAccountState } = useAppSelector(
+    (state) => state.timelineReducer
+  );
+  const dispatch = useAppDispatch();
+
   const [errorType, setErrorType] = useState('');
-  const [createAccount] = useCreateAccountMutation();
 
-  const onCreateAccount = () => {
-    if (password !== confirmpassword) {
-      setPwdError(true);
-    } else {
-      const req = {
-        username: userName,
-        password,
-        email,
-        phonenumber: phnNumber,
-      };
-      createUserAccount(createAccount, req, (state, errMsg) => {
-        setView(state);
-        if (state === 'ERROR_VIEW' && errMsg) setErrorType(errMsg);
-      });
-    }
-  };
-
-  switch (view) {
+  switch (createAccountState) {
     case 'CREATE_ACCOUNT': {
-      return (
-        <CreateAccount
-          userName={userName}
-          setUserName={setUserName}
-          password={password}
-          setPassword={setPassword}
-          email={email}
-          setEmail={setEmail}
-          confirmpassword={confirmpassword}
-          setConfirmPassword={setConfirmPassword}
-          phnNumber={phnNumber}
-          setPhnNumber={setPhnNumber}
-          accountType={accountType}
-          setAccountType={setAccountType}
-          pwdError={pwdError}
-          onCreateAccount={onCreateAccount}
-        />
-      );
+      return <CreateAccount setErrorType={setErrorType} />;
     }
 
     case 'ERROR_VIEW': {
-      return <ErrorView errorType={errorType} setView={setView} />;
+      return (
+        <ErrorView
+          errorType={errorType}
+          setView={(state) => dispatch(setCreateAccountState(state))}
+        />
+      );
     }
 
     case 'ACCOUNT_CREATED': {

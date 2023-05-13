@@ -44,6 +44,7 @@ function TimelinePostCard({
         <Card.Subtitle className="mb-3">{imgcaption}</Card.Subtitle>
         {imgSrc ? (
           <Card.Img
+            aria-label={`posted-img-${imgSrc}`}
             style={{ width: '100%', height: 600, objectFit: 'cover' }}
             src={imgSrc}
           />

@@ -42,23 +42,16 @@ interface CreateAccountErrRes {
 }
 
 interface ErrorViewProps {
-  setView: React.Dispatch<React.SetStateAction<string>>;
+  setView: (state: CreateAccountStates) => void;
   errorType: string;
 }
 
+type CreateAccountStates =
+  | 'CREATE_ACCOUNT'
+  | 'ERROR_VIEW'
+  | 'ACCOUNT_CREATED'
+  | 'LOADING';
+
 interface CreateAccountProps {
-  userName: string;
-  setUserName: React.Dispatch<React.SetStateAction<string>>;
-  password: string;
-  setPassword: React.Dispatch<React.SetStateAction<string>>;
-  email: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  confirmpassword: string;
-  setConfirmPassword: React.Dispatch<React.SetStateAction<string>>;
-  phnNumber: null | string;
-  setPhnNumber: React.Dispatch<React.SetStateAction<string | null>>;
-  accountType: null | string;
-  setAccountType: React.Dispatch<React.SetStateAction<string | null>>;
-  pwdError: boolean;
-  onCreateAccount: () => void;
+  setErrorType: React.Dispatch<React.SetStateAction<string>>;
 }

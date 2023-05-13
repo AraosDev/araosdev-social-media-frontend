@@ -1,37 +1,66 @@
-import React from 'react';
+/* eslint-disable import/order */
+import React, { useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
 import FormHeader from '../../Common/FormHeader';
 
 import '../Login/index.css';
 
-function CreateAccount(props: CreateAccountProps): React.ReactElement {
-  const {
-    userName,
-    email,
-    phnNumber,
-    accountType,
-    password,
-    confirmpassword,
-    pwdError,
-  } = props;
-  const {
-    setUserName,
-    setEmail,
-    setPhnNumber,
-    setAccountType,
-    setPassword,
-    setConfirmPassword,
-    onCreateAccount,
-  } = props;
+import {
+  CreateAccountConstants,
+  LoginAccountConstants,
+} from 'Common/AppLabels/LoginPageLabels';
+import { useCreateAccountMutation } from 'Store/apiSlices/mainAPISlice';
+import { createUserAccount } from 'Store/mutationTriggers/loginTriggers';
+import { setCreateAccountState } from 'Store/reducer/timelineReducer';
+import { useAppDispatch } from 'Store/store/hooks';
 
+function CreateAccount(props: CreateAccountProps): React.ReactElement {
+  const { setErrorType } = props;
+  const [createAccount] = useCreateAccountMutation();
+  const dispatch = useAppDispatch();
+  const {
+    NEWACCOUNT_HEADER,
+    EMAIL_LABEL,
+    EMAIL_PLACEHOLDER,
+    PHN_NUMBER_LABEL,
+    PHN_NUMBER_PLACEHOLDER,
+    ACCOUNT_TYPE_LABEL,
+    DEFAULT_OPTION,
+    PRIVATE_OPTION,
+    PUBLIC_OPTION,
+    CONFIRM_PWD_LABEL,
+    CONFIRM_PWD_PLACEHOLDER,
+    CREATE_ACCOUNT,
+    PWD_ERROR,
+  } = CreateAccountConstants;
+  const { USERNAME_LABEL, USERNAME_PLACEHOLDER, PWD_LABEL, PWD_PLACEHOLDER } =
+    LoginAccountConstants;
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmpassword, setConfirmPassword] = useState('');
+  const [phonenumber, setPhonenumber] = useState<null | string>(null);
+  const [accountType, setAccountType] = useState<null | string>(null);
+  const [pwdError, setPwdError] = useState(false);
+
+  const onCreateAccount = () => {
+    if (password !== confirmpassword) setPwdError(true);
+    else {
+      const req = { username, password, email, phonenumber };
+      createUserAccount(createAccount, req, (state, errMsg) => {
+        dispatch(setCreateAccountState(state));
+        if (state === 'ERROR_VIEW' && errMsg) setErrorType(errMsg);
+      });
+    }
+  };
   return (
     <div className="wrapper">
       <div className="cardWrapper">
         <FormHeader />
         <Card className="m-4">
           <Card.Header as="h5" className="cardHeader caveatBold">
-            Create your account
+            {NEWACCOUNT_HEADER}
           </Card.Header>
           <Card.Body>
             <Form className="form-grp-style">
@@ -43,12 +72,12 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className="mx-3 d-flex justify-content-start caveatBold"
                 >
-                  User Name
+                  {USERNAME_LABEL}
                   <Form.Control
                     type="text"
-                    placeholder="Enter your user name"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
+                    placeholder={USERNAME_PLACEHOLDER}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </Form.Label>
 
@@ -56,10 +85,10 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className=" mx-3 d-flex justify-content-start caveatBold"
                 >
-                  Email
+                  {EMAIL_LABEL}
                   <Form.Control
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={EMAIL_PLACEHOLDER}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -74,13 +103,13 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className=" mx-3 d-flex justify-content-start caveatBold"
                 >
-                  Phone Number
+                  {PHN_NUMBER_LABEL}
                   <Form.Control
                     type="text"
-                    placeholder="Enter your Phone Number"
-                    value={phnNumber || ''}
+                    placeholder={PHN_NUMBER_PLACEHOLDER}
+                    value={phonenumber || ''}
                     onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setPhnNumber(e.target.value.replace(/\D/, ''))
+                      setPhonenumber(e.target.value.replace(/\D/, ''))
                     }
                   />
                 </Form.Label>
@@ -88,16 +117,17 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className=" mx-3 d-flex justify-content-start caveatBold"
                 >
-                  Account Type
+                  {ACCOUNT_TYPE_LABEL}
                   <Form.Select
+                    data-testid="account-type-dropdown"
                     value={accountType || ''}
                     onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
                       setAccountType(e.target.value)
                     }
                   >
-                    <option disabled>Please select account type</option>
-                    <option>Private</option>
-                    <option>Public</option>
+                    <option disabled>{DEFAULT_OPTION}</option>
+                    <option value={PRIVATE_OPTION}>{PRIVATE_OPTION}</option>
+                    <option value={PUBLIC_OPTION}>{PUBLIC_OPTION}</option>
                   </Form.Select>
                 </Form.Label>
               </Form.Group>
@@ -110,10 +140,10 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className="mx-3 d-flex justify-content-start caveatBold"
                 >
-                  Password
+                  {PWD_LABEL}
                   <Form.Control
                     type="password"
-                    placeholder="Type your Password"
+                    placeholder={PWD_PLACEHOLDER}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -122,10 +152,10 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className="mx-3 d-flex justify-content-start caveatBold"
                 >
-                  Confirm Password
+                  {CONFIRM_PWD_LABEL}
                   <Form.Control
                     type="password"
-                    placeholder="Confirm your password"
+                    placeholder={CONFIRM_PWD_PLACEHOLDER}
                     value={confirmpassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
@@ -137,10 +167,10 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                 className="caveatBold loginBtn"
                 style={{ color: 'black' }}
               >
-                Create Account
+                {CREATE_ACCOUNT}
               </Button>
               <div className="caveatBold" style={{ color: 'red' }}>
-                {pwdError ? '* Passwords do not match' : ''}
+                {pwdError ? PWD_ERROR : ''}
               </div>
             </Form>
           </Card.Body>

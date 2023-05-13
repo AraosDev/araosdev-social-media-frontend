@@ -181,7 +181,7 @@ function TimelineBody(): React.ReactElement {
     ) {
       return (
         <div className="py-3">
-          {data.map((image, index) => (
+          {data?.map((image, index) => (
             <TimelinePostCard
               key={image._id}
               cardClassName={`${index === data.length - 1 ? '' : 'mb-4'}`}

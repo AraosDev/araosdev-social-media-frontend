@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
@@ -5,26 +6,27 @@ import FormHeader from '../../Common/FormHeader';
 
 import '../Login/index.css';
 
+import { CreateAccountConstants } from 'Common/AppLabels/LoginPageLabels';
+
 function ErrorView(props: ErrorViewProps): React.ReactElement {
+  const {
+    ACCOUNT_LIMIT_EXCEEDED,
+    ALREADY_EXISTING_ACCOUNT,
+    UNKNOWN_ERROR,
+    BACK_TO_CREATE_ACC,
+    BACK_TO_SIGN_IN,
+  } = CreateAccountConstants;
   const { errorType, setView } = props;
   return (
     <div className="wrapper">
       <div className="cardWrapper">
         <FormHeader />
         {errorType === 'ACCOUNT_LIMIT_EXCEEDED' ? (
-          <p className="caveatBold">
-            Number of Trial Accounts created exceded the limit. Use existing
-            accounts to login
-          </p>
+          <p className="caveatBold">{ACCOUNT_LIMIT_EXCEEDED}</p>
         ) : errorType === 'ALREADY_EXISTING_ACCOUNT' ? (
-          <p className="caveatBold">
-            This account is already existing in our database. Create a unique
-            one
-          </p>
+          <p className="caveatBold">{ALREADY_EXISTING_ACCOUNT}</p>
         ) : (
-          <p className="caveatBold">
-            Unknown Error Occurred. Try again sometime
-          </p>
+          <p className="caveatBold">{UNKNOWN_ERROR}</p>
         )}
         <div>
           <Button
@@ -32,11 +34,11 @@ function ErrorView(props: ErrorViewProps): React.ReactElement {
             className="caveatBold loginBtn"
             style={{ color: 'black' }}
           >
-            Go Back to Create account
+            {BACK_TO_CREATE_ACC}
           </Button>
           <Link to="/">
             <Button className="caveatBold loginBtn" style={{ color: 'black' }}>
-              Go back to Sign In
+              {BACK_TO_SIGN_IN}
             </Button>
           </Link>
         </div>

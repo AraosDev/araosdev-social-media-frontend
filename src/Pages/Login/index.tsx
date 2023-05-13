@@ -4,8 +4,22 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import './index.css';
 
+import { LoginAccountConstants } from 'Common/AppLabels/LoginPageLabels';
 import { useLoggedInUserInfoMutation } from 'Store/apiSlices/mainAPISlice';
 import { getLoggedInUserInfo } from 'Store/mutationTriggers/loginTriggers';
+
+const {
+  HEADER_1,
+  HEADER_2,
+  LOGIN_HEADER,
+  USERNAME_LABEL,
+  USERNAME_PLACEHOLDER,
+  PWD_LABEL,
+  PWD_PLACEHOLDER,
+  LOGIN_BTN_LABEL,
+  FORGOT_PWD,
+  NEW_ACCOUNT,
+} = LoginAccountConstants;
 
 function Login(): React.ReactElement {
   const navigate = useNavigate();
@@ -28,12 +42,12 @@ function Login(): React.ReactElement {
   return (
     <div className="wrapper">
       <div className="cardWrapper">
-        <h2 className="caveatBold">AraosDev</h2>
-        <h2 className="caveatBold">Social Media Web App</h2>
+        <h2 className="caveatBold">{HEADER_1}</h2>
+        <h2 className="caveatBold">{HEADER_2}</h2>
         <hr className="my-2" style={{ border: '1px solid', width: '100%' }} />
         <Card className="m-4">
           <Card.Header as="h5" className="cardHeader caveatBold">
-            Login to your account
+            {LOGIN_HEADER}
           </Card.Header>
           <Card.Body>
             <Form className="form-grp-style">
@@ -42,10 +56,10 @@ function Login(): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className="mx-3 d-flex justify-content-start caveatBold"
                 >
-                  User Name
+                  {USERNAME_LABEL}
                   <Form.Control
                     type="text"
-                    placeholder="Enter your user name"
+                    placeholder={USERNAME_PLACEHOLDER}
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                   />
@@ -57,10 +71,10 @@ function Login(): React.ReactElement {
                   style={{ flexDirection: 'column' }}
                   className="mx-3 d-flex justify-content-start caveatBold"
                 >
-                  Password
+                  {PWD_LABEL}
                   <Form.Control
                     type="password"
-                    placeholder="Type your Password"
+                    placeholder={PWD_PLACEHOLDER}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -71,7 +85,7 @@ function Login(): React.ReactElement {
                 className="caveatBold loginBtn"
                 style={{ color: 'black' }}
               >
-                Login
+                {LOGIN_BTN_LABEL}
               </Button>
             </Form>
             <div className="mt-3 d-flex justify-content-evenly">
@@ -80,15 +94,14 @@ function Login(): React.ReactElement {
                 className="caveatBold"
                 href="#"
               >
-                Forgot Password?
+                {FORGOT_PWD}
               </Card.Link>
               <Link to="/newaccount" style={{ textDecoration: 'none' }}>
                 <Card.Link
                   style={{ textDecoration: 'none' }}
                   className="caveatBold"
-                  href="#"
                 >
-                  New Account?
+                  {NEW_ACCOUNT}
                 </Card.Link>
               </Link>
             </div>
