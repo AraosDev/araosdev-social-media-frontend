@@ -36,18 +36,30 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
   } = CreateAccountConstants;
   const { USERNAME_LABEL, USERNAME_PLACEHOLDER, PWD_LABEL, PWD_PLACEHOLDER } =
     LoginAccountConstants;
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmpassword, setConfirmPassword] = useState('');
-  const [phonenumber, setPhonenumber] = useState<null | string>(null);
-  const [accountType, setAccountType] = useState<null | string>(null);
+  const [userName, setUsername] =
+    useState<CreateAccountPayload['userName']>('');
+  const [email, setEmail] = useState<CreateAccountPayload['email']>('');
+  const [password, setPassword] =
+    useState<CreateAccountPayload['password']>('');
+  const [confirmPassword, setConfirmPassword] =
+    useState<CreateAccountPayload['confirmPassword']>('');
+  const [phoneNumber, setPhonenumber] =
+    useState<CreateAccountPayload['phoneNumber']>('');
+  const [accountType, setAccountType] =
+    useState<CreateAccountPayload['accountType']>('public');
   const [pwdError, setPwdError] = useState(false);
 
   const onCreateAccount = () => {
-    if (password !== confirmpassword) setPwdError(true);
+    if (password !== confirmPassword) setPwdError(true);
     else {
-      const req = { username, password, email, phonenumber };
+      const req = {
+        userName,
+        password,
+        email,
+        phoneNumber,
+        accountType,
+        confirmPassword,
+      };
       createUserAccount(createAccount, req, (state, errMsg) => {
         dispatch(setCreateAccountState(state));
         if (state === 'ERROR_VIEW' && errMsg) setErrorType(errMsg);
@@ -76,7 +88,7 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   <Form.Control
                     type="text"
                     placeholder={USERNAME_PLACEHOLDER}
-                    value={username}
+                    value={userName}
                     onChange={(e) => setUsername(e.target.value)}
                   />
                 </Form.Label>
@@ -107,7 +119,7 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   <Form.Control
                     type="text"
                     placeholder={PHN_NUMBER_PLACEHOLDER}
-                    value={phonenumber || ''}
+                    value={phoneNumber || ''}
                     onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setPhonenumber(e.target.value.replace(/\D/, ''))
                     }
@@ -122,12 +134,18 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                     data-testid="account-type-dropdown"
                     value={accountType || ''}
                     onInput={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                      setAccountType(e.target.value)
+                      setAccountType(
+                        e.target.value as CreateAccountPayload['accountType']
+                      )
                     }
                   >
                     <option disabled>{DEFAULT_OPTION}</option>
-                    <option value={PRIVATE_OPTION}>{PRIVATE_OPTION}</option>
-                    <option value={PUBLIC_OPTION}>{PUBLIC_OPTION}</option>
+                    <option value={PRIVATE_OPTION.toLowerCase()}>
+                      {PRIVATE_OPTION}
+                    </option>
+                    <option value={PUBLIC_OPTION.toLowerCase()}>
+                      {PUBLIC_OPTION}
+                    </option>
                   </Form.Select>
                 </Form.Label>
               </Form.Group>
@@ -156,7 +174,7 @@ function CreateAccount(props: CreateAccountProps): React.ReactElement {
                   <Form.Control
                     type="password"
                     placeholder={CONFIRM_PWD_PLACEHOLDER}
-                    value={confirmpassword}
+                    value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </Form.Label>

@@ -1,12 +1,19 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import styled from 'styled-components';
 
+import DefaultDp from 'Assets/default.jpg';
+
 const StyledProfileIcon = styled.div`
   width: ${(props) => props.iconSize};
   height: ${(props) => props.iconSize};
   border-radius: 50%;
   background-color: ${(props) => props.iconBg};
   color: ${(props: ProfileIconProps) => props.iconTextColor};
+  img {
+    width: ${(props) => props.iconSize};
+    height: ${(props) => props.iconSize};
+    border-radius: 50%;
+  }
 `;
 
 function ProfileIcon({
@@ -25,7 +32,7 @@ function ProfileIcon({
       className={`cursor-pointer d-flex justify-content-center align-items-center ${className}`}
       {...otherProps}
     >
-      <span>{iconText}</span>
+      <img src={DefaultDp} className="dp-image" alt="user-dp" />
     </StyledProfileIcon>
   );
 }

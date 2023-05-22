@@ -60,3 +60,23 @@ interface ProfileIconProps {
   iconText?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
+
+interface AppButtonProps {
+  children: JSX.Element | string;
+  className?: string;
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+}
+
+interface AppToastProps {
+  show: boolean;
+  setShow: (show: AppToastProps['show']) => void;
+  toastHeader: string;
+  toastBody: string;
+  toastPosition:
+    | 'top-right'
+    | 'top-center'
+    | 'top-left'
+    | 'bottom-right'
+    | 'bottom-center'
+    | 'bottom-left';
+}

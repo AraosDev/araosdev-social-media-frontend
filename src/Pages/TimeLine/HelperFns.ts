@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import {
   currentUser,
   currentUserInfo,
@@ -11,7 +12,7 @@ export const didCurrentUserLiked = (
   return false;
 };
 
-export const frndUserRelation = (
+/* export const frndUserRelation = (
   frnd: string
 ): BadgeLabels | { label: ''; reqType: ''; loaderLabel: '' } => {
   const { friendRequests, friends } = currentUserInfo() as UserInfo;
@@ -22,4 +23,4 @@ export const frndUserRelation = (
   if (requestedTo.includes(frnd)) return frndUserRelations.REVOKE_REQ;
   if (friends.includes(frnd)) return frndUserRelations.REMOVE_FRIEND;
   return frndUserRelations.ADD_FRIEND;
-};
+}; */

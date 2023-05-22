@@ -30,12 +30,29 @@ export const unixTimeToReadableFormat = (unixTime: number) => {
 
 export const currentUser = () => {
   const userInfo = localStorage.getItem('userInfo');
-  return userInfo ? JSON.parse(userInfo).details.userName : '';
+  return userInfo ? JSON.parse(userInfo).user.userName : '';
 };
 
-export const currentUserInfo = () => {
+export const currentUserInfo = (): UserInfo => {
   const userInfo = localStorage.getItem('userInfo');
-  return userInfo ? JSON.parse(userInfo).details : {};
+  return userInfo
+    ? (JSON.parse(userInfo).user as UserInfo)
+    : {
+        email: '',
+        userName: '',
+        phoneNumber: '',
+        accountType: 'public',
+        followers: [],
+        following: [],
+        id: '',
+        friends: [],
+        friendRequests: { requestedBy: [], requestedTo: [] },
+      };
+};
+
+export const getCurrentToken = () => {
+  const userInfo = localStorage.getItem('userInfo');
+  return userInfo ? JSON.parse(userInfo).token : '';
 };
 
 export const debounce = (func: Function, delay: number) => {

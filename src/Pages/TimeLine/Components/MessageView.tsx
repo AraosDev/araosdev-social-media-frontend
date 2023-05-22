@@ -32,13 +32,13 @@ function MessageView(): React.ReactElement {
   return (
     <StyledMsgView className="py-3">
       {friends.map((friend) => (
-        <ListGroup.Item key={friend} className="d-flex cursor-pointer">
+        <ListGroup.Item key={friend.email} className="d-flex cursor-pointer">
           <ProfileIcon
             className="message-profile-icon"
-            iconText={friend.charAt(0).toUpperCase()}
+            iconText={friend.userName.charAt(0).toUpperCase()}
           />
           <div className="d-flex flex-column mx-2 message-frnd">
-            <span className="message-user-name">{friend}</span>
+            <span className="message-user-name">{friend.userName}</span>
             <span className="message-recent">
               Most Recent Message comes here. . .
             </span>

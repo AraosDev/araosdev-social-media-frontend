@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import {
   currentUser,
   currentUserInfo,
+  getCurrentToken,
   randomString,
   unixTimeToReadableFormat,
 } from 'Common/helperFns';
@@ -12,7 +13,7 @@ import {
   updateLikeCountTransformer,
 } from 'Store/transformers/timelineTransformer';
 
-export const appApiBaseURL = 'http://localhost:5000/araosdevsm/';
+export const appApiBaseURL = process.env.REACT_APP_API_BASE_URL;
 
 export const adsmApiSlice = createApi({
   reducerPath: 'adsmMainReducer',
@@ -25,11 +26,20 @@ export const adsmApiSlice = createApi({
         url: '/login',
         method: 'POST',
         body: userCredentials,
+        credentials: 'include',
       }),
       transformResponse: (res: LoggedUserInfoApiRes) => {
         localStorage.setItem('userInfo', JSON.stringify({ ...res }));
         return { ...res };
       },
+    }),
+    // Logging out the current user
+    logoutUser: builder.query<LogoutApiRes, null>({
+      query: () => ({
+        url: 'logout',
+        headers: { Authorization: `Bearer ${getCurrentToken()}` },
+        credentials: 'include',
+      }),
     }),
     // Creating an user account API
     createAccount: builder.mutation<
@@ -37,9 +47,10 @@ export const adsmApiSlice = createApi({
       CreateAccountPayload
     >({
       query: (createAccountpayload) => ({
-        url: '/createaccount',
+        url: '/signup',
         method: 'POST',
         body: createAccountpayload,
+        credentials: 'include',
       }),
       transformErrorResponse: (errorRes) => {
         const { data } = errorRes as { data: Partial<CreateAccountErrRes> };
@@ -50,6 +61,34 @@ export const adsmApiSlice = createApi({
             typeof data.message === 'string' ? data.message : 'UNKNOWN_ERROR',
         };
       },
+    }),
+    // Sending a reset token API to the mail box
+    forgotPassword: builder.query<ForgotPasswordApiRes, string>({
+      query: (userDetail) => `forgotPassword?userDetail=${userDetail}`,
+    }),
+    // Reset password API
+    resetPassword: builder.mutation<ForgotPasswordApiRes, ResetPwdReq>({
+      query: (reqBody) => {
+        const { password, confirmPassword, token } = reqBody;
+        return {
+          url: `resetPassword/${token}`,
+          method: 'PATCH',
+          body: { password, confirmPassword },
+          credentials: 'include',
+        };
+      },
+    }),
+    // Updating the current user info
+    updateCurrentUserInfo: builder.mutation<
+      UpdateUserInfoApiRes,
+      Partial<UserInfo>
+    >({
+      query: (userInfoPayload) => ({
+        method: 'PATCH',
+        body: userInfoPayload,
+        url: 'updateAccount/me',
+        headers: { Authorization: `Bearer ${getCurrentToken()}` },
+      }),
     }),
     // Getting timeline image APIs
     getTimeLineImgs: builder.query<TransformedTimelineImgRes[], string>({
@@ -66,24 +105,24 @@ export const adsmApiSlice = createApi({
       PostTimelineImgPayload
     >({
       query: (postTimelineImgReq) => {
-        const { file, caption, username } = postTimelineImgReq;
+        const { file, caption, userName } = postTimelineImgReq;
         const body = new FormData();
         body.append('file', file);
         return {
-          url: `gcp-apis/post-image/${username}?caption=${caption}`,
+          url: `gcp-apis/post-image/${userName}?caption=${caption}`,
           method: 'POST',
           body,
         };
       },
       invalidatesTags: ['UPDATE_TIMELINE'],
       transformResponse: (response: PostTimelineImgRes, _meta, arg) => {
-        const { caption, username, file } = arg;
+        const { caption, userName, file } = arg;
         const newTimelineData = {
-          userName: username,
+          userName,
           image: response.status === 'UPLOADED' ? file.name : '',
           imageLink:
             response.status === 'UPLOADED'
-              ? `https://storage.googleapis.com/araosdev-social-media.appspot.com/${username}/${file.name}`
+              ? `https://storage.googleapis.com/araosdev-social-media.appspot.com/${userName}/${file.name}`
               : '',
           imageName:
             response.status === 'UPLOADED'
@@ -228,7 +267,7 @@ export const adsmApiSlice = createApi({
                   ...existingUserInfo.friendRequests,
                   requestedTo:
                     existingUserInfo.friendRequests.requestedTo.filter(
-                      (frnd: string) => frnd !== friend
+                      (frnd) => frnd.userName !== friend
                     ),
                 },
               };
@@ -242,7 +281,7 @@ export const adsmApiSlice = createApi({
                   ...existingUserInfo.friendRequests,
                   requestedBy:
                     existingUserInfo.friendRequests.requestedBy.filter(
-                      (frnd: string) => frnd !== user
+                      (frnd) => frnd.userName !== user
                     ),
                 },
               };
@@ -252,7 +291,7 @@ export const adsmApiSlice = createApi({
               newUserInfo = {
                 ...existingUserInfo,
                 friends: existingUserInfo.friends.filter(
-                  (frnd: string) => frnd !== friend
+                  (frnd) => frnd.userName !== friend
                 ),
               };
               break;
@@ -280,6 +319,10 @@ export const adsmApiSlice = createApi({
 export const {
   useGetTimeLineImgsQuery,
   useLoggedInUserInfoMutation,
+  useLazyLogoutUserQuery,
+  useLazyForgotPasswordQuery,
+  useResetPasswordMutation,
+  useUpdateCurrentUserInfoMutation,
   useCreateAccountMutation,
   usePostTimelineImgMutation,
   useUpdateLikeCountMutation,

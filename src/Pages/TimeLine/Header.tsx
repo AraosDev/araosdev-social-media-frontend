@@ -2,13 +2,13 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useRef, useState } from 'react';
-import { Badge, Dropdown, Form } from 'react-bootstrap';
+import { Dropdown, Form } from 'react-bootstrap';
 import { BsPlusSquare, BsXLg } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 
-import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
+// import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
 import { Loader } from '../../Common/DataTransitionHandlers';
 import FormHeader from '../../Common/FormHeader';
 import { currentUser, unixTimeToReadableFormat } from '../../Common/helperFns';
@@ -16,14 +16,14 @@ import ModalComp from '../../Common/ModalComp';
 import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
 
-import { frndUserRelation } from './HelperFns';
-
+// import { frndUserRelation } from './HelperFns';
 import {
-  useFriendRequestMutation,
+  useLazyLogoutUserQuery,
+  // useFriendRequestMutation,
   usePostTimelineImgMutation,
-  useSearchFriendListQuery,
+  // useSearchFriendListQuery,
 } from 'Store/apiSlices/mainAPISlice';
-import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+// import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
 import { postImageInTimeline } from 'Store/mutationTriggers/timelineTrigger';
 import { setTimelineState } from 'Store/reducer/timelineReducer';
 import { useAppDispatch, useAppSelector } from 'Store/store/hooks';
@@ -58,28 +58,30 @@ function TimeLineHeader(): React.ReactElement {
 
   const { timelineState } = useAppSelector((state) => state.timelineReducer);
 
-  const [selectedFrnd, setSelectedFrnd] = useState('');
-  const [frndReqState, setFrndReqState] = useState<
+  // const [selectedFrnd, setSelectedFrnd] = useState('');
+  /* const [frndReqState, setFrndReqState] = useState<
     { frnd: string; state: string }[]
-  >([]);
+  >([]); */
   const [openAddPostModal, setOpenAddPostModal] = useState(false);
   const [postedImg, setPostedImg] = useState<null | File>(null);
   const [postedImgCaption, setPostedImgCaption] = useState('');
   const [postImgState, setPostImgState] = useState('');
   const [openProfileDrpDwn, setOpenProfileDrpDwn] = useState(false);
-  const [debouncedSearchKey, setDebouncedSearchKey] = useState('');
+  // const [debouncedSearchKey, setDebouncedSearchKey] = useState('');
 
   const [postImage, { isLoading }] = usePostTimelineImgMutation();
-  const {
+  const [logout, { isLoading: isLogoutLoading, isSuccess: isLogoutSuccess }] =
+    useLazyLogoutUserQuery();
+  /* const {
     data: frndSuggestions,
     isFetching: isFrndSuggestionLoading,
     isError: isFrndSuggestionErr,
     isSuccess: isFrndSuggestionFetched,
     error: frndSuggestionErr,
-  } = useSearchFriendListQuery(debouncedSearchKey);
-  const [friendReqtTrigger] = useFriendRequestMutation();
+  } = useSearchFriendListQuery(debouncedSearchKey); */
+  // const [friendReqtTrigger] = useFriendRequestMutation();
 
-  const frndUserRelationChange = (
+  /* const frndUserRelationChange = (
     frnd: string,
     label: string,
     event: React.MouseEvent<HTMLElement, MouseEvent>
@@ -120,9 +122,9 @@ function TimeLineHeader(): React.ReactElement {
       } else existingStates.push({ frnd, state: `${requestType}_${state}` });
       setFrndReqState(existingStates);
     });
-  };
+  }; */
 
-  const getFrndRelationBadgeLabel = (frnd: string) => {
+  /* const getFrndRelationBadgeLabel = (frnd: string) => {
     const { state = '' } =
       frndReqState.find(({ frnd: friend }) => friend === frnd) || {};
     const { label, loaderLabel } = frndUserRelation(frnd);
@@ -168,7 +170,7 @@ function TimeLineHeader(): React.ReactElement {
         {label}
       </Badge>
     );
-  };
+  }; */
 
   const onCaptureUploadedImg = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = new File([':)'], 'profile-pic (2).jpg', {
@@ -200,7 +202,7 @@ function TimeLineHeader(): React.ReactElement {
           {
             file: postedImg,
             caption: postedImgCaption,
-            username: userName,
+            userName,
           },
           (state) => {
             if (state === 'SUCCESS') closeModal();
@@ -302,7 +304,7 @@ function TimeLineHeader(): React.ReactElement {
         className="d-flex justify-content-center align-items-center"
         style={{ flex: '9' }}
       >
-        <AutoSuggestion
+        {/* <AutoSuggestion
           defaultValue={selectedFrnd}
           inputTypeProps={{
             inputTextFontSize: 16,
@@ -341,7 +343,7 @@ function TimeLineHeader(): React.ReactElement {
               </li>
             );
           }}
-        />
+        /> */}
       </div>
       <div
         className="d-flex justify-content-end align-items-center"
@@ -372,20 +374,27 @@ function TimeLineHeader(): React.ReactElement {
               My Timeline
             </Dropdown.Item>
           ) : null}
-          {timelineState !== 'FRIEND_LIST_VIEW' ? (
+          {/* {timelineState !== 'FRIEND_LIST_VIEW' ? (
             <Dropdown.Item onClick={() => switchViews('FRIEND_LIST_VIEW')}>
               My Friends
             </Dropdown.Item>
-          ) : null}
+          ) : null} */}
           {timelineState !== 'MESSAGE_VIEW' ? (
             <Dropdown.Item onClick={() => switchViews('MESSAGE_VIEW')}>
               Messages
             </Dropdown.Item>
           ) : null}
+          <Dropdown.Item onClick={() => navigate('/account-settings')}>
+            Account Settings
+          </Dropdown.Item>
           <Dropdown.Item
             onClick={() => {
-              localStorage.clear();
-              navigate('/', { replace: true });
+              logout(null).then((res) => {
+                if (res.data?.status === 'SUCCESS') {
+                  localStorage.clear();
+                  navigate('/', { replace: true });
+                }
+              });
             }}
           >
             Logout

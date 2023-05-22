@@ -29,10 +29,9 @@ export const getLoggedInUserInfo = (
   trigger(reqBody)
     .unwrap()
     .then((res) => {
-      const { credentialsVerified: isVerified, status } = res;
-      if (isVerified === 'OK' && status === 200) {
-        captureTriggerStatus('SUCCESS');
-      } else captureTriggerStatus('ERROR');
+      const { status } = res;
+      if (status === 'SUCCESS') captureTriggerStatus('SUCCESS');
+      else captureTriggerStatus('ERROR');
     })
     .catch(() => captureTriggerStatus('ERROR'));
 };
@@ -63,11 +62,8 @@ export const createUserAccount = (
   trigger(reqBody)
     .unwrap()
     .then((res) => {
-      if (res.status === 400 && res.updated === 'FAILED' && res.message) {
-        captureTriggerStatus('ERROR_VIEW', res.message.toUpperCase());
-      } else if (res.status === 200 && res.updated === 'OK') {
-        captureTriggerStatus('ACCOUNT_CREATED');
-      }
+      if (res.status === 'SUCCESS') captureTriggerStatus('ACCOUNT_CREATED');
+      else captureTriggerStatus('ERROR_VIEW');
     })
     .catch(() => captureTriggerStatus('ERROR_VIEW'));
 };
