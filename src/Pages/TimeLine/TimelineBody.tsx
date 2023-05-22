@@ -1,25 +1,26 @@
 /* eslint-disable import/order */
 /* eslint-disable no-underscore-dangle */
 import { useState } from 'react';
-import { Badge, Container, ListGroup, Tab, Tabs } from 'react-bootstrap';
+// import { Badge, Container, ListGroup, Tab, Tabs } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 import styled from 'styled-components';
 
 import { Loader } from '../../Common/DataTransitionHandlers';
-import { currentUser, currentUserInfo } from '../../Common/helperFns';
-import ProfileIcon from '../../Common/ProfileIcon';
+import { currentUser } from '../../Common/helperFns';
+// import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
 
 import MessageView from './Components/MessageView';
 import { didCurrentUserLiked } from './HelperFns';
 
 import {
-  useFriendRequestMutation,
+  // useFriendRequestMutation,
   useGetTimeLineImgsQuery,
   useUpdateCommentMutation,
   useUpdateLikeCountMutation,
 } from 'Store/apiSlices/mainAPISlice';
-import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+// import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
 import { useAppSelector } from 'Store/store/hooks';
 
 const StyledTimelineBody = styled.div`
@@ -71,20 +72,20 @@ function TimelineBody(): React.ReactElement {
   );
   const [updateLikeCountFn] = useUpdateLikeCountMutation();
   const [updateCommentFn] = useUpdateCommentMutation();
-  const [friendReqtTrigger] = useFriendRequestMutation();
+  // const [friendReqtTrigger] = useFriendRequestMutation();
   const { timelineState } = useAppSelector((state) => state.timelineReducer);
 
-  const { friends, friendRequests } = currentUserInfo() as UserInfo;
-  const { requestedTo, requestedBy } = friendRequests;
+  // const { friends, friendRequests } = currentUserInfo() as UserInfo;
+  // const { requestedTo, requestedBy } = friendRequests;
 
   const [openedCommentSectImgs, setOpenCommentSecImgs] = useState<string[]>([]);
   const [newCommentInImgs, setNewCommentInImgs] = useState<
     { id: string; comment: string }[]
   >([]);
-  const [frndReqState, setFrndReqState] = useState<
+  /* const [frndReqState, setFrndReqState] = useState<
     { friend: string; state: string }[]
-  >([]);
-  const [frndReqTab, setFrndReqTab] = useState<string>('My Friends');
+  >([]); */
+  // const [frndReqTab, setFrndReqTab] = useState<string>('My Friends');
 
   const updateLikeCount = (
     imgDetail: TransformedTimelineImgRes,
@@ -134,7 +135,7 @@ function TimelineBody(): React.ReactElement {
     return '';
   };
 
-  const handleUserFrndRelations = (
+  /* const handleUserFrndRelations = (
     friend: string,
     requestType: frndRequestReq['requestType']
   ) => {
@@ -163,7 +164,7 @@ function TimelineBody(): React.ReactElement {
       } else existingStates.push({ friend, state: `${requestType}_${state}` });
       setFrndReqState(existingStates);
     });
-  };
+  }; */
 
   const getTimelineContent = () => {
     if (isFetching) {
@@ -229,7 +230,7 @@ function TimelineBody(): React.ReactElement {
         </div>
       );
     }
-    if (timelineState === 'FRIEND_LIST_VIEW') {
+    /* if (timelineState === 'FRIEND_LIST_VIEW') {
       return (
         <Tabs
           activeKey={frndReqTab}
@@ -375,7 +376,7 @@ function TimelineBody(): React.ReactElement {
           </Tab>
         </Tabs>
       );
-    }
+    } */
     if (timelineState === 'MESSAGE_VIEW') {
       return <MessageView />;
     }

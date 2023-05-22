@@ -31,7 +31,7 @@ function Login(): React.ReactElement {
   const onLogin = () => {
     getLoggedInUserInfo(
       loggedInUserInfo,
-      { username: userName, password },
+      { userDetail: userName, password },
       (state) => {
         if (state === 'SUCCESS') navigate('/timeline', { replace: true });
         else if (state === 'ERROR') alert('Login Failed !!');
@@ -89,13 +89,15 @@ function Login(): React.ReactElement {
               </Button>
             </Form>
             <div className="mt-3 d-flex justify-content-evenly">
-              <Card.Link
-                style={{ textDecoration: 'none' }}
-                className="caveatBold"
-                href="#"
-              >
-                {FORGOT_PWD}
-              </Card.Link>
+              <Link to="/forgotpassword" style={{ textDecoration: 'none' }}>
+                <Card.Link
+                  style={{ textDecoration: 'none' }}
+                  className="caveatBold"
+                  href="#"
+                >
+                  {FORGOT_PWD}
+                </Card.Link>
+              </Link>
               <Link to="/newaccount" style={{ textDecoration: 'none' }}>
                 <Card.Link
                   style={{ textDecoration: 'none' }}

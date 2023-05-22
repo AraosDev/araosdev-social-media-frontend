@@ -23,18 +23,18 @@ export const getAbsoluteApiUrl = (relativePath: string) => {
 };
 const handlers = [
   rest.post(getAbsoluteApiUrl('login'), async (req, res, ctx) => {
-    const { username } = await req.json();
-    if (username === 'Invalid user')
+    const { userName } = await req.json();
+    if (userName === 'Invalid user')
       return res(ctx.status(200), ctx.json(loginAPIErrResponse));
     return res(ctx.status(200), ctx.json(loginAPIResponse));
   }),
   rest.post(getAbsoluteApiUrl('createaccount'), async (req, res, ctx) => {
-    const { username } = await req.json();
-    if (username === 'ACC_LIMIT_TEST_USER')
+    const { userName } = await req.json();
+    if (userName === 'ACC_LIMIT_TEST_USER')
       return res(ctx.status(200), ctx.json(createAccountAPILimitExceedRes));
-    if (username === 'EXISTING_USER')
+    if (userName === 'EXISTING_USER')
       return res(ctx.status(200), ctx.json(createAccountAPIExistingAcc));
-    if (username === 'UNKNOWN_USER')
+    if (userName === 'UNKNOWN_USER')
       return res(ctx.status(200), ctx.json(createAccountAPIUnknownErr));
     return res(ctx.status(200), ctx.json(createAccountAPIRes));
   }),

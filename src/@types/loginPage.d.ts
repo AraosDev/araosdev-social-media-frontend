@@ -1,35 +1,50 @@
 interface UserInfo {
-  userName: string;
+  accountType: 'public' | 'private' | 'celebrity' | 'professional';
   email: string;
+  followers: UserInfo[];
+  following: UserInfo[];
+  userName: string;
+  id: string;
   phoneNumber: string;
-  friends: string[];
+  friends: UserInfo[];
   friendRequests: {
-    requestedTo: string[];
-    requestedBy: string[];
+    requestedTo: UserInfo[];
+    requestedBy: UserInfo[];
   };
 }
 
 interface LoggedUserInfoApiRes {
-  status: number;
-  credentialsVerified: string;
+  status: string;
   details: UserInfo;
 }
 
+interface LogoutApiRes {
+  status: string;
+  message: string;
+  token: string;
+}
+
 interface UserCredentials {
-  username: string;
+  userDetail: string;
   password: string;
 }
 
 interface CreateAccountPayload {
-  username: string;
+  userName: string;
   password: string;
   email: string;
-  phonenumber: phnNumber;
+  phoneNumber: string;
+  confirmPassword: string;
+  accountType: 'public' | 'private' | 'professional' | 'celebrity';
 }
 
 interface CreateAccountSucessRes {
-  status: 200;
-  updated: 'OK';
+  status: 'SUCCESS';
+  user: {
+    email: UserInfo['email'];
+    phoneNumber: UserInfo['phoneNumber'];
+    userName: UserInfo['username'];
+  };
 }
 
 interface CreateAccountErrRes {
@@ -41,17 +56,28 @@ interface CreateAccountErrRes {
     | 'UNKNOWN_ERROR';
 }
 
-interface ErrorViewProps {
-  setView: (state: CreateAccountStates) => void;
-  errorType: string;
-}
-
 type CreateAccountStates =
   | 'CREATE_ACCOUNT'
   | 'ERROR_VIEW'
   | 'ACCOUNT_CREATED'
   | 'LOADING';
 
+interface ErrorViewProps {
+  setView: (state: CreateAccountStates) => void;
+  errorType: string;
+}
+
 interface CreateAccountProps {
   setErrorType: React.Dispatch<React.SetStateAction<string>>;
+}
+
+interface ForgotPasswordApiRes {
+  status: string;
+  message: string;
+}
+
+interface ResetPwdReq {
+  password: string;
+  confirmPassword: string;
+  token: string;
 }

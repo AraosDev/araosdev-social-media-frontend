@@ -31,7 +31,7 @@ describe('Testing LoginPage', () => {
     expect(screen.queryByText(HEADER_1)).toBeInTheDocument();
   });
 
-  it('With Correct pwd and username', async () => {
+  it('With Correct pwd and userName', async () => {
     await user.type(screen.getByPlaceholderText(USERNAME_PLACEHOLDER), 'Seenu');
     await user.type(screen.getByPlaceholderText(PWD_PLACEHOLDER), 'qwerty123');
     await user.click(screen.getByText(LOGIN_BTN_LABEL));
@@ -39,7 +39,7 @@ describe('Testing LoginPage', () => {
     expect(mockedUsedNavigate).toBeCalled();
   });
 
-  it('With incorrect pwd and username', async () => {
+  it('With incorrect pwd and userName', async () => {
     await user.type(
       screen.getByPlaceholderText(USERNAME_PLACEHOLDER),
       'Invalid user'
