@@ -1,5 +1,8 @@
+/* eslint-disable import/order */
 /* eslint-disable react/jsx-props-no-spreading */
 import styled from 'styled-components';
+
+import { currentUserInfo } from './helperFns';
 
 import DefaultDp from 'Assets/default.jpg';
 
@@ -24,6 +27,7 @@ function ProfileIcon({
   iconText = '',
   ...otherProps
 }: ProfileIconProps) {
+  const imageSrc = currentUserInfo().photo || DefaultDp;
   return (
     <StyledProfileIcon
       iconBg={iconBg}
@@ -32,7 +36,7 @@ function ProfileIcon({
       className={`cursor-pointer d-flex justify-content-center align-items-center ${className}`}
       {...otherProps}
     >
-      <img src={DefaultDp} className="dp-image" alt="user-dp" />
+      <img src={imageSrc} className="dp-image" alt="user-dp" />
     </StyledProfileIcon>
   );
 }
