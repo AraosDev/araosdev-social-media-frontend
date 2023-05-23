@@ -10,7 +10,7 @@ import { MutationTrigger } from '@reduxjs/toolkit/dist/query/react/buildHooks';
 const updateAccountInfoTrigger = (
   trigger: MutationTrigger<
     MutationDefinition<
-      Partial<UserInfo>,
+      FormData,
       BaseQueryFn<
         string | FetchArgs,
         unknown,
@@ -23,7 +23,7 @@ const updateAccountInfoTrigger = (
       'adsmMainReducer'
     >
   >,
-  reqBody: Partial<UserInfo>,
+  reqBody: FormData,
   captureTriggerStatus: (
     state: GeneralSettingUpdateState,
     data?: UpdateUserInfoApiRes['user']

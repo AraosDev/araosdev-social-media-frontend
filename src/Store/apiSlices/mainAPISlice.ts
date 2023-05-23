@@ -79,10 +79,7 @@ export const adsmApiSlice = createApi({
       },
     }),
     // Updating the current user info
-    updateCurrentUserInfo: builder.mutation<
-      UpdateUserInfoApiRes,
-      Partial<UserInfo>
-    >({
+    updateCurrentUserInfo: builder.mutation<UpdateUserInfoApiRes, FormData>({
       query: (userInfoPayload) => ({
         method: 'PATCH',
         body: userInfoPayload,

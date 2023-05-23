@@ -1,5 +1,5 @@
 /* eslint-disable import/order */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 
 import StyledAccountSetting from './index.styles';
@@ -20,6 +20,7 @@ function GeneralSettings() {
     userName: name,
     phoneNumber: phoneNo,
   } = currentUserInfo();
+  const imageSrc = currentUserInfo().photo || DefaultDp;
 
   const [updateAccountState, setUpdateAccountState] =
     useState<GeneralSettingUpdateState>('LOADED');
@@ -27,46 +28,53 @@ function GeneralSettings() {
   const [userName, setUserName] = useState(name);
   const [email, setEmail] = useState(mail);
   const [phoneNumber, setPhoneNumber] = useState(phoneNo);
+  const [currentDp, setCurrentDp] = useState(imageSrc);
+
+  const dpFileIpRef: React.RefObject<HTMLInputElement> = useRef(null);
 
   const resetFields = () => {
     setUserName(name);
     setEmail(mail);
     setPhoneNumber(phoneNo);
+    setCurrentDp(imageSrc);
   };
 
   const onSaveChanges = () => {
-    updateAccountInfoTrigger(
-      updateAccountTrigger,
-      { userName, email, phoneNumber },
-      (state, user) => {
-        setUpdateAccountState(state);
-        if (state === 'LOADED' && user) {
-          const storageUserInfo = localStorage.getItem('userInfo');
-          const updatedInfo = storageUserInfo
-            ? { ...JSON.parse(storageUserInfo), user }
-            : null;
-          if (updatedInfo !== null)
-            localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
-          setUserName(user.userName);
-          setEmail(user.email);
-          setPhoneNumber(user.phoneNumber);
-          setShow({
-            state: true,
-            message: 'Account Info successfully updated',
-          });
-        } else if (state === 'ERROR') {
-          resetFields();
-          setShow({
-            state: true,
-            message: 'Something went wrong. Please try again !',
-          });
-        }
+    const formData = new FormData();
+
+    formData.append('userName', userName);
+    formData.append('email', email);
+    formData.append('phoneNumber', phoneNumber);
+    if (typeof currentDp !== 'string') formData.append('photo', currentDp);
+
+    updateAccountInfoTrigger(updateAccountTrigger, formData, (state, user) => {
+      setUpdateAccountState(state);
+      if (state === 'LOADED' && user) {
+        const storageUserInfo = localStorage.getItem('userInfo');
+        const updatedInfo = storageUserInfo
+          ? { ...JSON.parse(storageUserInfo), user }
+          : null;
+        if (updatedInfo !== null)
+          localStorage.setItem('userInfo', JSON.stringify(updatedInfo));
+        setUserName(user.userName);
+        setEmail(user.email);
+        setPhoneNumber(user.phoneNumber);
+        setShow({
+          state: true,
+          message: 'Account Info successfully updated',
+        });
+      } else if (state === 'ERROR') {
+        resetFields();
+        setShow({
+          state: true,
+          message: 'Something went wrong. Please try again !',
+        });
       }
-    );
+    });
   };
 
   return (
-    <StyledAccountSetting className="h-100 py-5">
+    <StyledAccountSetting className="h-100 py-4">
       <AppToast
         toastHeader={
           updateAccountState === 'LOADED'
@@ -112,8 +120,41 @@ function GeneralSettings() {
               </Col>
             </Row>
           </Col>
-          <Col lg={6} xl={6} className="d-flex justify-content-center">
-            <img src={DefaultDp} className="dp-image" alt="user-dp" />
+          <Col
+            lg={6}
+            xl={6}
+            className="d-flex justify-content-center flex-column align-items-center"
+          >
+            <img
+              src={
+                typeof currentDp === 'string'
+                  ? currentDp
+                  : URL.createObjectURL(currentDp)
+              }
+              className="dp-image"
+              alt="user-dp"
+            />
+            <AppButtonOutline
+              onClick={() => {
+                if (typeof dpFileIpRef.current !== 'string')
+                  dpFileIpRef.current?.click();
+              }}
+              className="mx-3"
+            >
+              Change DP
+            </AppButtonOutline>
+            <input
+              ref={dpFileIpRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setCurrentDp(e.target.files[0]);
+                  if (dpFileIpRef.current && dpFileIpRef.current.value)
+                    dpFileIpRef.current.value = '';
+                }
+              }}
+              type="file"
+              style={{ display: 'none' }}
+            />
           </Col>
         </Row>
       )}

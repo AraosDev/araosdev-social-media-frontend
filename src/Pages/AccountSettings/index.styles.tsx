@@ -5,6 +5,8 @@ import styled from 'styled-components';
 const StyledAccountSetting = styled(Container)`
   img {
     border-radius: 50% !important;
+    max-width: 300px;
+    max-height: 300px;
   }
 `;
 

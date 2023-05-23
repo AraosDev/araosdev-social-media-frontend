@@ -7,6 +7,7 @@ interface UserInfo {
   id: string;
   phoneNumber: string;
   friends: UserInfo[];
+  photo?: string;
   friendRequests: {
     requestedTo: UserInfo[];
     requestedBy: UserInfo[];
