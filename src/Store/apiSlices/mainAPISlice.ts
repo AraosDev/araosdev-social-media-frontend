@@ -13,7 +13,7 @@ import {
   updateLikeCountTransformer,
 } from 'Store/transformers/timelineTransformer';
 
-export const appApiBaseURL = process.env.REACT_APP_API_BASE_URL;
+export const appApiBaseURL = '/';
 
 export const adsmApiSlice = createApi({
   reducerPath: 'adsmMainReducer',
@@ -23,7 +23,7 @@ export const adsmApiSlice = createApi({
     // Getting logged in user details
     loggedInUserInfo: builder.mutation<LoggedUserInfoApiRes, UserCredentials>({
       query: (userCredentials) => ({
-        url: '/login',
+        url: 'AUTHNZ/login',
         method: 'POST',
         body: userCredentials,
         credentials: 'include',
@@ -36,7 +36,7 @@ export const adsmApiSlice = createApi({
     // Logging out the current user
     logoutUser: builder.query<LogoutApiRes, null>({
       query: () => ({
-        url: 'logout',
+        url: 'AUTHNZ/logout',
         headers: { Authorization: `Bearer ${getCurrentToken()}` },
         credentials: 'include',
       }),
@@ -47,7 +47,7 @@ export const adsmApiSlice = createApi({
       CreateAccountPayload
     >({
       query: (createAccountpayload) => ({
-        url: '/signup',
+        url: 'AUTHNZ/signup',
         method: 'POST',
         body: createAccountpayload,
         credentials: 'include',
@@ -64,14 +64,14 @@ export const adsmApiSlice = createApi({
     }),
     // Sending a reset token API to the mail box
     forgotPassword: builder.query<ForgotPasswordApiRes, string>({
-      query: (userDetail) => `forgotPassword?userDetail=${userDetail}`,
+      query: (userDetail) => `AUTHNZ/forgotPassword?userDetail=${userDetail}`,
     }),
     // Reset password API
     resetPassword: builder.mutation<ForgotPasswordApiRes, ResetPwdReq>({
       query: (reqBody) => {
         const { password, confirmPassword, token } = reqBody;
         return {
-          url: `resetPassword/${token}`,
+          url: `AUTHNZ/resetPassword/${token}`,
           method: 'PATCH',
           body: { password, confirmPassword },
           credentials: 'include',
@@ -81,9 +81,9 @@ export const adsmApiSlice = createApi({
     // Updating the current user info
     updateCurrentUserInfo: builder.mutation<UpdateUserInfoApiRes, FormData>({
       query: (userInfoPayload) => ({
+        url: 'AUTHNZ/updateAccount/me',
         method: 'PATCH',
         body: userInfoPayload,
-        url: 'updateAccount/me',
         headers: { Authorization: `Bearer ${getCurrentToken()}` },
       }),
     }),
