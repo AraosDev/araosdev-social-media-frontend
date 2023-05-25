@@ -18,13 +18,11 @@ interface TimeLineImgApiRes {
 }
 
 interface TransformedTimelineImgRes extends TimelineImages {
-  imageLink: string;
   postedDate: string;
   imageName: string;
 }
 
 interface PostTimelineImgPayload {
-  userName: TimelineImages['userName'];
   file: File;
   caption: string;
 }
@@ -35,9 +33,8 @@ interface PostTimelineImgRes {
 
 interface UpdateLikeReqBody {
   likedFlag: 'INCREMENT' | 'DECREMENT';
-  postName: string;
-  postedBy: TimelineImages['userName'];
   imgDetail: TransformedTimelineImgRes;
+  postId: TimelineImages['_id'];
 }
 
 interface UpdateCommentReqBody extends Omit<UpdateLikeReqBody, 'likedFlag'> {

@@ -202,7 +202,6 @@ function TimeLineHeader(): React.ReactElement {
           {
             file: postedImg,
             caption: postedImgCaption,
-            userName,
           },
           (state) => {
             if (state === 'SUCCESS') closeModal();

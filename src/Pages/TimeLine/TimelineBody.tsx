@@ -67,7 +67,7 @@ const StyledTimelineBody = styled.div`
 `;
 
 function TimelineBody(): React.ReactElement {
-  const { isLoading, isSuccess, data } = useGetTimeLineImgsQuery(currentUser());
+  const { isLoading, isSuccess, data } = useGetTimeLineImgsQuery(undefined);
   const [updateLikeCountFn] = useUpdateLikeCountMutation();
   const [updateCommentFn] = useUpdateCommentMutation();
   // const [friendReqtTrigger] = useFriendRequestMutation();
@@ -90,9 +90,8 @@ function TimelineBody(): React.ReactElement {
     flag: UpdateLikeReqBody['likedFlag']
   ) => {
     const reqBody = {
-      postName: imgDetail.image,
-      postedBy: imgDetail.userName,
       likedFlag: flag,
+      postId: imgDetail._id,
       imgDetail,
     };
     updateLikeCountFn(reqBody).unwrap();
@@ -112,8 +111,7 @@ function TimelineBody(): React.ReactElement {
       newCommentInImgs.find(({ id }) => imgDetail._id === id) || {};
     if (comment) {
       const reqBody = {
-        postName: imgDetail.image,
-        postedBy: imgDetail.userName,
+        postId: imgDetail._id,
         comment,
         imgDetail,
         onCacheUpdate: () => {

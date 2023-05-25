@@ -88,11 +88,12 @@ export const adsmApiSlice = createApi({
       }),
     }),
     // Getting timeline image APIs
-    getTimeLineImgs: builder.query<TransformedTimelineImgRes[], string>({
-      query: (userName) => {
+    getTimeLineImgs: builder.query<TransformedTimelineImgRes[], undefined>({
+      query: () => {
         return {
-          url: `/gcp-apis/timeline-images?users=${userName}`,
+          url: `/gcp-apis/timeline-images`,
           method: 'GET',
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       providesTags: ['UPDATE_TIMELINE'],
@@ -107,25 +108,22 @@ export const adsmApiSlice = createApi({
       PostTimelineImgPayload
     >({
       query: (postTimelineImgReq) => {
-        const { file, caption, userName } = postTimelineImgReq;
+        const { file, caption } = postTimelineImgReq;
         const body = new FormData();
         body.append('file', file);
         return {
-          url: `gcp-apis/post-image/${userName}?caption=${caption}`,
+          url: `/gcp-apis/timeline-images?caption=${caption}`,
           method: 'POST',
           body,
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       invalidatesTags: ['UPDATE_TIMELINE'],
       transformResponse: (response: PostTimelineImgRes, _meta, arg) => {
-        const { caption, userName, file } = arg;
+        const { caption, file } = arg;
         const newTimelineData = {
-          userName,
+          userName: currentUser(),
           image: response.status === 'UPLOADED' ? file.name : '',
-          imageLink:
-            response.status === 'UPLOADED'
-              ? `https://storage.googleapis.com/araosdev-social-media.appspot.com/${userName}/${file.name}`
-              : '',
           imageName:
             response.status === 'UPLOADED'
               ? file.name
@@ -158,18 +156,19 @@ export const adsmApiSlice = createApi({
     // Updating a like count (Increment/Decrement)
     updateLikeCount: builder.mutation<UpdateLikeCountRes, UpdateLikeReqBody>({
       query: (body) => {
-        const { postName, postedBy, likedFlag } = body;
+        const { postId, likedFlag } = body;
         return {
-          url: `/updateImgMetaData/updateLike/${currentUser()}`,
-          method: 'POST',
-          body: { postName, postedBy, likedFlag },
+          url: `/gcp-apis/timeline-images/updateLike`,
+          method: 'PATCH',
+          body: { postId, likedFlag },
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       onQueryStarted(reqBody, { dispatch, queryFulfilled }) {
         const updatedData = dispatch(
           adsmApiSlice.util.updateQueryData(
             'getTimeLineImgs',
-            currentUser(),
+            undefined,
             (posts) => {
               return updateLikeCountTransformer(
                 posts,
@@ -185,18 +184,19 @@ export const adsmApiSlice = createApi({
     // Adding a comment API
     updateComment: builder.mutation<UpdateCommentRes, UpdateCommentReqBody>({
       query: (body) => {
-        const { postName, postedBy, comment } = body;
+        const { postId, comment } = body;
         return {
-          url: `/updateImgMetaData/updateComment/${currentUser()}`,
-          method: 'POST',
-          body: { postName, postedBy, comment },
+          url: `/gcp-apis/timeline-images/updateComment`,
+          method: 'PATCH',
+          body: { postId, comment },
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       onQueryStarted(reqBody, { dispatch, queryFulfilled }) {
         const updatedData = dispatch(
           adsmApiSlice.util.updateQueryData(
             'getTimeLineImgs',
-            currentUser(),
+            undefined,
             (posts) => {
               return updateCommentTransformer(
                 posts,
