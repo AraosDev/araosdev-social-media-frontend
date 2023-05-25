@@ -67,9 +67,7 @@ const StyledTimelineBody = styled.div`
 `;
 
 function TimelineBody(): React.ReactElement {
-  const { isFetching, isSuccess, data } = useGetTimeLineImgsQuery(
-    currentUser()
-  );
+  const { isLoading, isSuccess, data } = useGetTimeLineImgsQuery(currentUser());
   const [updateLikeCountFn] = useUpdateLikeCountMutation();
   const [updateCommentFn] = useUpdateCommentMutation();
   // const [friendReqtTrigger] = useFriendRequestMutation();
@@ -167,7 +165,7 @@ function TimelineBody(): React.ReactElement {
   }; */
 
   const getTimelineContent = () => {
-    if (isFetching) {
+    if (isLoading) {
       return (
         <Loader
           className="loader-element caveatBold"
@@ -189,7 +187,7 @@ function TimelineBody(): React.ReactElement {
               imagePostedBy={image.userName}
               imagePostedOn={image.postedDate}
               imgcaption={image.caption}
-              imgSrc={image.imageLink}
+              imgSrc={image.image}
               commentType="normal"
               didCurrentUserLiked={didCurrentUserLiked(image.likedBy)}
               updateLikeCount={(flag) => updateLikeCount(image, flag)}
@@ -387,7 +385,7 @@ function TimelineBody(): React.ReactElement {
     <StyledTimelineBody>
       <Container
         className={`timeline-body-container ${
-          isFetching || isSuccess ? 'frnd-list-view' : ''
+          isLoading || isSuccess ? 'frnd-list-view' : ''
         }`}
       >
         {getTimelineContent()}

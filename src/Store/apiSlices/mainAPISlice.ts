@@ -89,7 +89,12 @@ export const adsmApiSlice = createApi({
     }),
     // Getting timeline image APIs
     getTimeLineImgs: builder.query<TransformedTimelineImgRes[], string>({
-      query: (userName) => `/gcp-apis/timeline-images/${userName}`,
+      query: (userName) => {
+        return {
+          url: `/gcp-apis/timeline-images?users=${userName}`,
+          method: 'GET',
+        };
+      },
       providesTags: ['UPDATE_TIMELINE'],
       transformResponse: (res) => {
         return transformTimeLineResponse(res as TimeLineImgApiRes)
