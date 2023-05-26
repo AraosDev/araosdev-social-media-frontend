@@ -147,6 +147,7 @@ export const adsmApiSlice = createApi({
           likedBy: [],
           caption,
           commentSection: [],
+          userPhoto: currentUserInfo().photo || '',
           _id: randomString(10),
         };
 
@@ -212,40 +213,55 @@ export const adsmApiSlice = createApi({
     }),
     // Searching friend list API
     searchFriendList: builder.query<TransFormedFrndSearchList, string>({
-      query: (searchKey) => `/searchfriends/${currentUser()}/${searchKey}`,
+      query: (searchKey) => {
+        return {
+          url: `AUTHNZ/searchUsers/${searchKey}`,
+          method: 'GET',
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
+        };
+      },
       transformResponse: (response: FrndListSearchRes) => {
-        const { status, filteredUsers } = response;
-        if (status === 'OK') {
-          return filteredUsers.map((frnd, index) => ({
-            value: frnd,
+        const { status, users } = response;
+        if (status === 'SUCCESS') {
+          return users.map((frnd, index) => ({
+            value: frnd.userName,
             valueId: index,
+            ...frnd,
           }));
         }
-        if (status === 'NO_USERS_FOUND_FOR_THIS_KEYWORD') return 'EMPTY';
         return 'ERROR';
       },
       transformErrorResponse: (errorRes) => {
         const { data } = errorRes as {
-          data: Pick<FrndListSearchRes, 'status'>;
+          data: Pick<FrndListSearchRes, 'status'> & { message: string };
         };
-        if (data.status === 'NO_USERS_FOUND_FOR_THIS_KEYWORD') return 'EMPTY';
+        if (
+          data.status === 'FAILED' &&
+          data.message === 'No Users match the searchKey'
+        )
+          return 'EMPTY';
         return 'ERROR';
       },
     }),
     // Sending Friend request API
     friendRequest: builder.mutation<string, frndRequestReq>({
       query: (reqBody) => {
-        const { user, requestType, friend } = reqBody;
+        const { friendDetails, userDetails, requestType } = reqBody;
         return {
-          url: `friendReq/${user || currentUser()}`,
+          url: `/friendReq/${requestType}`,
           method: 'POST',
-          body: { requestType, friend },
+          body: { friendDetails, userDetails },
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
-      transformResponse: (response: { status: string }, _meta, arg) => {
-        const { requestType, friend, user } = arg;
-        const { status } = response;
-        if (status === `${requestType}_SUCESS`) {
+      transformResponse: (
+        response: { status: string; user: UserInfo },
+        _meta,
+        arg
+      ) => {
+        const { requestType } = arg;
+        const { status, user } = response;
+        if (status === 'SUCCESS') {
           const existingUserInfo = currentUserInfo();
           let newUserInfo;
           switch (requestType) {
@@ -254,10 +270,7 @@ export const adsmApiSlice = createApi({
                 ...existingUserInfo,
                 friendRequests: {
                   ...existingUserInfo.friendRequests,
-                  requestedTo: [
-                    ...existingUserInfo.friendRequests.requestedTo,
-                    friend,
-                  ],
+                  requestedTo: [...user.friendRequests.requestedTo],
                 },
               };
               break;
@@ -267,10 +280,7 @@ export const adsmApiSlice = createApi({
                 ...existingUserInfo,
                 friendRequests: {
                   ...existingUserInfo.friendRequests,
-                  requestedTo:
-                    existingUserInfo.friendRequests.requestedTo.filter(
-                      (frnd) => frnd.userName !== friend
-                    ),
+                  requestedTo: user.friendRequests.requestedTo,
                 },
               };
               break;
@@ -281,10 +291,7 @@ export const adsmApiSlice = createApi({
                 ...existingUserInfo,
                 friendRequests: {
                   ...existingUserInfo.friendRequests,
-                  requestedBy:
-                    existingUserInfo.friendRequests.requestedBy.filter(
-                      (frnd) => frnd.userName !== user
-                    ),
+                  requestedBy: user.friendRequests.requestedBy,
                 },
               };
               break;
@@ -292,9 +299,7 @@ export const adsmApiSlice = createApi({
             case 'REMOVE_FRIEND': {
               newUserInfo = {
                 ...existingUserInfo,
-                friends: existingUserInfo.friends.filter(
-                  (frnd) => frnd.userName !== friend
-                ),
+                friends: user.friends,
               };
               break;
             }
@@ -304,9 +309,9 @@ export const adsmApiSlice = createApi({
           localStorage.setItem(
             'userInfo',
             JSON.stringify({
-              details: { ...newUserInfo },
-              credentialsVerified: 'OK',
-              status: 200,
+              user: { ...newUserInfo },
+              status: 'SUCCESS',
+              token: getCurrentToken(),
             })
           );
           return '';

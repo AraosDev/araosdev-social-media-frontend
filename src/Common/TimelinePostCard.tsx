@@ -26,12 +26,16 @@ function TimelinePostCard({
   newCommentChangeHandler,
   postNewCommentHandler,
   noImgAvailableText = '',
+  profileDp = '',
   ...cardProps
 }: TimelinePostCardProps) {
   return (
     <Card className={cardClassName} style={cardStyle} {...cardProps}>
       <Card.Header className="d-flex">
-        <ProfileIcon iconText={imagePostedBy.charAt(0).toUpperCase()} />
+        <ProfileIcon
+          profileDp={profileDp}
+          iconText={imagePostedBy.charAt(0).toUpperCase()}
+        />
         <div
           className="d-flex flex-column ms-2"
           style={{ fontSize: 13, fontWeight: 700 }}

@@ -12,15 +12,17 @@ export const didCurrentUserLiked = (
   return false;
 };
 
-/* export const frndUserRelation = (
+export const frndUserRelation = (
   frnd: string
 ): BadgeLabels | { label: ''; reqType: ''; loaderLabel: '' } => {
   const { friendRequests, friends } = currentUserInfo() as UserInfo;
   const { requestedTo, requestedBy } = friendRequests;
 
-  if (requestedBy.includes(frnd))
+  if (requestedBy.some(({ userName }) => userName === frnd))
     return { label: '', reqType: '', loaderLabel: '' };
-  if (requestedTo.includes(frnd)) return frndUserRelations.REVOKE_REQ;
-  if (friends.includes(frnd)) return frndUserRelations.REMOVE_FRIEND;
+  if (requestedTo.some(({ userName }) => userName === frnd))
+    return frndUserRelations.REVOKE_REQ;
+  if (friends.some(({ userName }) => userName === frnd))
+    return frndUserRelations.REMOVE_FRIEND;
   return frndUserRelations.ADD_FRIEND;
-}; */
+};

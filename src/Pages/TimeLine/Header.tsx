@@ -2,28 +2,33 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useRef, useState } from 'react';
-import { Dropdown, Form } from 'react-bootstrap';
+import { Badge, Dropdown, Form } from 'react-bootstrap';
 import { BsPlusSquare, BsXLg } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 
-// import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
+import AutoSuggestion from '../../Common/AutoSuggestion/AutoSuggestion';
 import { Loader } from '../../Common/DataTransitionHandlers';
 import FormHeader from '../../Common/FormHeader';
-import { currentUser, unixTimeToReadableFormat } from '../../Common/helperFns';
+import {
+  currentUser,
+  currentUserInfo,
+  unixTimeToReadableFormat,
+} from '../../Common/helperFns';
 import ModalComp from '../../Common/ModalComp';
 import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
 
-// import { frndUserRelation } from './HelperFns';
+import { frndUserRelation } from './HelperFns';
+
 import {
+  useFriendRequestMutation,
   useLazyLogoutUserQuery,
-  // useFriendRequestMutation,
   usePostTimelineImgMutation,
-  // useSearchFriendListQuery,
+  useSearchFriendListQuery,
 } from 'Store/apiSlices/mainAPISlice';
-// import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
+import { friendRequestTrigger } from 'Store/mutationTriggers/frndReqTrigger';
 import { postImageInTimeline } from 'Store/mutationTriggers/timelineTrigger';
 import { setTimelineState } from 'Store/reducer/timelineReducer';
 import { useAppDispatch, useAppSelector } from 'Store/store/hooks';
@@ -58,31 +63,30 @@ function TimeLineHeader(): React.ReactElement {
 
   const { timelineState } = useAppSelector((state) => state.timelineReducer);
 
-  // const [selectedFrnd, setSelectedFrnd] = useState('');
-  /* const [frndReqState, setFrndReqState] = useState<
+  const [selectedFrnd, setSelectedFrnd] = useState('');
+  const [frndReqState, setFrndReqState] = useState<
     { frnd: string; state: string }[]
-  >([]); */
+  >([]);
   const [openAddPostModal, setOpenAddPostModal] = useState(false);
   const [postedImg, setPostedImg] = useState<null | File>(null);
   const [postedImgCaption, setPostedImgCaption] = useState('');
   const [postImgState, setPostImgState] = useState('');
   const [openProfileDrpDwn, setOpenProfileDrpDwn] = useState(false);
-  // const [debouncedSearchKey, setDebouncedSearchKey] = useState('');
+  const [debouncedSearchKey, setDebouncedSearchKey] = useState('');
 
   const [postImage, { isLoading }] = usePostTimelineImgMutation();
-  const [logout, { isLoading: isLogoutLoading, isSuccess: isLogoutSuccess }] =
-    useLazyLogoutUserQuery();
-  /* const {
+  const [logout] = useLazyLogoutUserQuery();
+  const {
     data: frndSuggestions,
     isFetching: isFrndSuggestionLoading,
     isError: isFrndSuggestionErr,
     isSuccess: isFrndSuggestionFetched,
     error: frndSuggestionErr,
-  } = useSearchFriendListQuery(debouncedSearchKey); */
-  // const [friendReqtTrigger] = useFriendRequestMutation();
+  } = useSearchFriendListQuery(debouncedSearchKey);
+  const [friendReqtTrigger] = useFriendRequestMutation();
 
-  /* const frndUserRelationChange = (
-    frnd: string,
+  const frndUserRelationChange = (
+    frnd: UserInfo,
     label: string,
     event: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
@@ -90,28 +94,21 @@ function TimeLineHeader(): React.ReactElement {
       event.stopPropagation();
       event.preventDefault();
     }
-    const { reqType } = frndUserRelation(frnd);
-    let reqBody: frndRequestReq;
-    if (reqType) {
-      reqBody = {
-        requestType: reqType,
-        friend: frnd,
-      };
-    } else {
-      reqBody = {
-        requestType: label.includes('Accept') ? 'ACCEPT_REQ' : 'REJECT_REQ',
-        friend: userName,
-        user: frnd,
-      };
-    }
+    const { reqType } = frndUserRelation(frnd.userName);
+    const reqBody = {
+      friendDetails: frnd,
+      userDetails: currentUserInfo(),
+      requestType:
+        reqType || (label.includes('Accept') ? 'ACCEPT_REQ' : 'REJECT_REQ'),
+    };
     friendRequestTrigger(friendReqtTrigger, { ...reqBody, event }, (state) => {
       const { requestType } = reqBody;
       const existingStates = [...frndReqState];
       const currentFrndReqState = existingStates.find(
-        ({ frnd: friend }) => friend === frnd
+        ({ frnd: friend }) => friend === frnd.userName
       );
       const currentFrndReqStateIndex = existingStates.findIndex(
-        ({ frnd: friend }) => friend === frnd
+        ({ frnd: friend }) => friend === frnd.userName
       );
       if (currentFrndReqState) {
         const newState = {
@@ -119,15 +116,19 @@ function TimeLineHeader(): React.ReactElement {
           state: `${requestType}_${state}`,
         };
         existingStates.splice(currentFrndReqStateIndex, 1, newState);
-      } else existingStates.push({ frnd, state: `${requestType}_${state}` });
+      } else
+        existingStates.push({
+          frnd: frnd.userName,
+          state: `${requestType}_${state}`,
+        });
       setFrndReqState(existingStates);
     });
-  }; */
+  };
 
-  /* const getFrndRelationBadgeLabel = (frnd: string) => {
+  const getFrndRelationBadgeLabel = (frnd: UserInfo) => {
     const { state = '' } =
-      frndReqState.find(({ frnd: friend }) => friend === frnd) || {};
-    const { label, loaderLabel } = frndUserRelation(frnd);
+      frndReqState.find(({ frnd: friend }) => friend === frnd.userName) || {};
+    const { label, loaderLabel } = frndUserRelation(frnd.userName);
     if (state.includes('LOADING') && loaderLabel) {
       return (
         <Badge className="cursor-not-allowed" text="dark">
@@ -170,13 +171,9 @@ function TimeLineHeader(): React.ReactElement {
         {label}
       </Badge>
     );
-  }; */
+  };
 
   const onCaptureUploadedImg = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = new File([':)'], 'profile-pic (2).jpg', {
-      type: 'image/jpeg',
-    });
-    console.log(file);
     if (e.target.files && e.target.files.length) {
       setPostedImg(e.target.files[0]);
     }
@@ -216,9 +213,6 @@ function TimeLineHeader(): React.ReactElement {
     dispatch(setTimelineState(view));
     setOpenProfileDrpDwn(false);
   };
-
-  if (postedImg !== null)
-    console.log(URL.createObjectURL(postedImg), postedImg);
 
   return (
     <StyledTimeLineHeader>
@@ -303,7 +297,7 @@ function TimeLineHeader(): React.ReactElement {
         className="d-flex justify-content-center align-items-center"
         style={{ flex: '9' }}
       >
-        {/* <AutoSuggestion
+        <AutoSuggestion
           defaultValue={selectedFrnd}
           inputTypeProps={{
             inputTextFontSize: 16,
@@ -338,11 +332,11 @@ function TimeLineHeader(): React.ReactElement {
                 onMouseDown={() => onHoverList(valObj)}
               >
                 {value}
-                {getFrndRelationBadgeLabel(value)}
+                {getFrndRelationBadgeLabel(valObj as unknown as UserInfo)}
               </li>
             );
           }}
-        /> */}
+        />
       </div>
       <div
         className="d-flex justify-content-end align-items-center"

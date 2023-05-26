@@ -25,9 +25,10 @@ function ProfileIcon({
   iconSize = '40px',
   iconTextColor = 'white',
   iconText = '',
+  profileDp = '',
   ...otherProps
 }: ProfileIconProps) {
-  const imageSrc = currentUserInfo().photo || DefaultDp;
+  const imageSrc = profileDp || currentUserInfo().photo || DefaultDp;
   return (
     <StyledProfileIcon
       iconBg={iconBg}

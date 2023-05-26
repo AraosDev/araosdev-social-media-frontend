@@ -1,22 +1,22 @@
 interface FrndListSearchRes {
   status: string;
-  filteredUsers: string[];
+  users: UserInfo[];
 }
 
 type TransFormedFrndSearchList =
-  | Array<{ value: string; valueId: number }>
+  | Array<{ value: string; valueId: number } & UserInfo>
   | 'EMPTY'
   | 'ERROR';
 
 interface frndRequestReq {
-  user?: string;
+  userDetails: UserInfo;
   requestType:
     | 'SEND_REQ'
     | 'ACCEPT_REQ'
     | 'REJECT_REQ'
     | 'REVOKE_REQ'
     | 'REMOVE_FRIEND';
-  friend: string;
+  friendDetails: UserInfo;
 }
 
 type BadgeLabels =

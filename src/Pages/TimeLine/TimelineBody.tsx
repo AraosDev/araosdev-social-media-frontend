@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap';
 import styled from 'styled-components';
 
 import { Loader } from '../../Common/DataTransitionHandlers';
-import { currentUser } from '../../Common/helperFns';
+// import { currentUser } from '../../Common/helperFns';
 // import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
 
@@ -184,6 +184,7 @@ function TimelineBody(): React.ReactElement {
               cardClassName={`${index === data.length - 1 ? '' : 'mb-4'}`}
               imagePostedBy={image.userName}
               imagePostedOn={image.postedDate}
+              profileDp={image.userPhoto}
               imgcaption={image.caption}
               imgSrc={image.image}
               commentType="normal"
