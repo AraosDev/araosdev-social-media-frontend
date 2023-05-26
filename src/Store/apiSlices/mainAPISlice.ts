@@ -13,7 +13,7 @@ import {
   updateLikeCountTransformer,
 } from 'Store/transformers/timelineTransformer';
 
-export const appApiBaseURL = process.env.REACT_APP_API_BASE_URL;
+export const appApiBaseURL = '/';
 
 export const adsmApiSlice = createApi({
   reducerPath: 'adsmMainReducer',
@@ -23,7 +23,7 @@ export const adsmApiSlice = createApi({
     // Getting logged in user details
     loggedInUserInfo: builder.mutation<LoggedUserInfoApiRes, UserCredentials>({
       query: (userCredentials) => ({
-        url: '/login',
+        url: 'AUTHNZ/login',
         method: 'POST',
         body: userCredentials,
         credentials: 'include',
@@ -36,7 +36,7 @@ export const adsmApiSlice = createApi({
     // Logging out the current user
     logoutUser: builder.query<LogoutApiRes, null>({
       query: () => ({
-        url: 'logout',
+        url: 'AUTHNZ/logout',
         headers: { Authorization: `Bearer ${getCurrentToken()}` },
         credentials: 'include',
       }),
@@ -47,7 +47,7 @@ export const adsmApiSlice = createApi({
       CreateAccountPayload
     >({
       query: (createAccountpayload) => ({
-        url: '/signup',
+        url: 'AUTHNZ/signup',
         method: 'POST',
         body: createAccountpayload,
         credentials: 'include',
@@ -64,14 +64,14 @@ export const adsmApiSlice = createApi({
     }),
     // Sending a reset token API to the mail box
     forgotPassword: builder.query<ForgotPasswordApiRes, string>({
-      query: (userDetail) => `forgotPassword?userDetail=${userDetail}`,
+      query: (userDetail) => `AUTHNZ/forgotPassword?userDetail=${userDetail}`,
     }),
     // Reset password API
     resetPassword: builder.mutation<ForgotPasswordApiRes, ResetPwdReq>({
       query: (reqBody) => {
         const { password, confirmPassword, token } = reqBody;
         return {
-          url: `resetPassword/${token}`,
+          url: `AUTHNZ/resetPassword/${token}`,
           method: 'PATCH',
           body: { password, confirmPassword },
           credentials: 'include',
@@ -81,15 +81,21 @@ export const adsmApiSlice = createApi({
     // Updating the current user info
     updateCurrentUserInfo: builder.mutation<UpdateUserInfoApiRes, FormData>({
       query: (userInfoPayload) => ({
+        url: 'AUTHNZ/updateAccount/me',
         method: 'PATCH',
         body: userInfoPayload,
-        url: 'updateAccount/me',
         headers: { Authorization: `Bearer ${getCurrentToken()}` },
       }),
     }),
     // Getting timeline image APIs
-    getTimeLineImgs: builder.query<TransformedTimelineImgRes[], string>({
-      query: (userName) => `/gcp-apis/timeline-images/${userName}`,
+    getTimeLineImgs: builder.query<TransformedTimelineImgRes[], undefined>({
+      query: () => {
+        return {
+          url: `/gcp-apis/timeline-images`,
+          method: 'GET',
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
+        };
+      },
       providesTags: ['UPDATE_TIMELINE'],
       transformResponse: (res) => {
         return transformTimeLineResponse(res as TimeLineImgApiRes)
@@ -102,25 +108,22 @@ export const adsmApiSlice = createApi({
       PostTimelineImgPayload
     >({
       query: (postTimelineImgReq) => {
-        const { file, caption, userName } = postTimelineImgReq;
+        const { file, caption } = postTimelineImgReq;
         const body = new FormData();
         body.append('file', file);
         return {
-          url: `gcp-apis/post-image/${userName}?caption=${caption}`,
+          url: `/gcp-apis/timeline-images?caption=${caption}`,
           method: 'POST',
           body,
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       invalidatesTags: ['UPDATE_TIMELINE'],
       transformResponse: (response: PostTimelineImgRes, _meta, arg) => {
-        const { caption, userName, file } = arg;
+        const { caption, file } = arg;
         const newTimelineData = {
-          userName,
+          userName: currentUser(),
           image: response.status === 'UPLOADED' ? file.name : '',
-          imageLink:
-            response.status === 'UPLOADED'
-              ? `https://storage.googleapis.com/araosdev-social-media.appspot.com/${userName}/${file.name}`
-              : '',
           imageName:
             response.status === 'UPLOADED'
               ? file.name
@@ -144,6 +147,7 @@ export const adsmApiSlice = createApi({
           likedBy: [],
           caption,
           commentSection: [],
+          userPhoto: currentUserInfo().photo || '',
           _id: randomString(10),
         };
 
@@ -153,18 +157,19 @@ export const adsmApiSlice = createApi({
     // Updating a like count (Increment/Decrement)
     updateLikeCount: builder.mutation<UpdateLikeCountRes, UpdateLikeReqBody>({
       query: (body) => {
-        const { postName, postedBy, likedFlag } = body;
+        const { postId, likedFlag } = body;
         return {
-          url: `/updateImgMetaData/updateLike/${currentUser()}`,
-          method: 'POST',
-          body: { postName, postedBy, likedFlag },
+          url: `/gcp-apis/timeline-images/updateLike`,
+          method: 'PATCH',
+          body: { postId, likedFlag },
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       onQueryStarted(reqBody, { dispatch, queryFulfilled }) {
         const updatedData = dispatch(
           adsmApiSlice.util.updateQueryData(
             'getTimeLineImgs',
-            currentUser(),
+            undefined,
             (posts) => {
               return updateLikeCountTransformer(
                 posts,
@@ -180,18 +185,19 @@ export const adsmApiSlice = createApi({
     // Adding a comment API
     updateComment: builder.mutation<UpdateCommentRes, UpdateCommentReqBody>({
       query: (body) => {
-        const { postName, postedBy, comment } = body;
+        const { postId, comment } = body;
         return {
-          url: `/updateImgMetaData/updateComment/${currentUser()}`,
-          method: 'POST',
-          body: { postName, postedBy, comment },
+          url: `/gcp-apis/timeline-images/updateComment`,
+          method: 'PATCH',
+          body: { postId, comment },
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
       onQueryStarted(reqBody, { dispatch, queryFulfilled }) {
         const updatedData = dispatch(
           adsmApiSlice.util.updateQueryData(
             'getTimeLineImgs',
-            currentUser(),
+            undefined,
             (posts) => {
               return updateCommentTransformer(
                 posts,
@@ -207,40 +213,55 @@ export const adsmApiSlice = createApi({
     }),
     // Searching friend list API
     searchFriendList: builder.query<TransFormedFrndSearchList, string>({
-      query: (searchKey) => `/searchfriends/${currentUser()}/${searchKey}`,
+      query: (searchKey) => {
+        return {
+          url: `AUTHNZ/searchUsers/${searchKey}`,
+          method: 'GET',
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
+        };
+      },
       transformResponse: (response: FrndListSearchRes) => {
-        const { status, filteredUsers } = response;
-        if (status === 'OK') {
-          return filteredUsers.map((frnd, index) => ({
-            value: frnd,
+        const { status, users } = response;
+        if (status === 'SUCCESS') {
+          return users.map((frnd, index) => ({
+            value: frnd.userName,
             valueId: index,
+            ...frnd,
           }));
         }
-        if (status === 'NO_USERS_FOUND_FOR_THIS_KEYWORD') return 'EMPTY';
         return 'ERROR';
       },
       transformErrorResponse: (errorRes) => {
         const { data } = errorRes as {
-          data: Pick<FrndListSearchRes, 'status'>;
+          data: Pick<FrndListSearchRes, 'status'> & { message: string };
         };
-        if (data.status === 'NO_USERS_FOUND_FOR_THIS_KEYWORD') return 'EMPTY';
+        if (
+          data.status === 'FAILED' &&
+          data.message === 'No Users match the searchKey'
+        )
+          return 'EMPTY';
         return 'ERROR';
       },
     }),
     // Sending Friend request API
     friendRequest: builder.mutation<string, frndRequestReq>({
       query: (reqBody) => {
-        const { user, requestType, friend } = reqBody;
+        const { friendDetails, userDetails, requestType } = reqBody;
         return {
-          url: `friendReq/${user || currentUser()}`,
+          url: `/friendReq/${requestType}`,
           method: 'POST',
-          body: { requestType, friend },
+          body: { friendDetails, userDetails },
+          headers: { Authorization: `Bearer ${getCurrentToken()}` },
         };
       },
-      transformResponse: (response: { status: string }, _meta, arg) => {
-        const { requestType, friend, user } = arg;
-        const { status } = response;
-        if (status === `${requestType}_SUCESS`) {
+      transformResponse: (
+        response: { status: string; user: UserInfo },
+        _meta,
+        arg
+      ) => {
+        const { requestType } = arg;
+        const { status, user } = response;
+        if (status === 'SUCCESS') {
           const existingUserInfo = currentUserInfo();
           let newUserInfo;
           switch (requestType) {
@@ -249,10 +270,7 @@ export const adsmApiSlice = createApi({
                 ...existingUserInfo,
                 friendRequests: {
                   ...existingUserInfo.friendRequests,
-                  requestedTo: [
-                    ...existingUserInfo.friendRequests.requestedTo,
-                    friend,
-                  ],
+                  requestedTo: [...user.friendRequests.requestedTo],
                 },
               };
               break;
@@ -262,10 +280,7 @@ export const adsmApiSlice = createApi({
                 ...existingUserInfo,
                 friendRequests: {
                   ...existingUserInfo.friendRequests,
-                  requestedTo:
-                    existingUserInfo.friendRequests.requestedTo.filter(
-                      (frnd) => frnd.userName !== friend
-                    ),
+                  requestedTo: user.friendRequests.requestedTo,
                 },
               };
               break;
@@ -276,10 +291,7 @@ export const adsmApiSlice = createApi({
                 ...existingUserInfo,
                 friendRequests: {
                   ...existingUserInfo.friendRequests,
-                  requestedBy:
-                    existingUserInfo.friendRequests.requestedBy.filter(
-                      (frnd) => frnd.userName !== user
-                    ),
+                  requestedBy: user.friendRequests.requestedBy,
                 },
               };
               break;
@@ -287,9 +299,7 @@ export const adsmApiSlice = createApi({
             case 'REMOVE_FRIEND': {
               newUserInfo = {
                 ...existingUserInfo,
-                friends: existingUserInfo.friends.filter(
-                  (frnd) => frnd.userName !== friend
-                ),
+                friends: user.friends,
               };
               break;
             }
@@ -299,9 +309,9 @@ export const adsmApiSlice = createApi({
           localStorage.setItem(
             'userInfo',
             JSON.stringify({
-              details: { ...newUserInfo },
-              credentialsVerified: 'OK',
-              status: 200,
+              user: { ...newUserInfo },
+              status: 'SUCCESS',
+              token: getCurrentToken(),
             })
           );
           return '';

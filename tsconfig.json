@@ -18,6 +18,15 @@
     "jsx": "react-jsx",
     "types": ["node", "jest", "@testing-library/jest-dom"]
   },
-  "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**.ts", "src/**.tsx"],
+  "include": [
+    "src",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**.ts",
+    "src/**.tsx",
+    "server",
+    "server/**/*.js",
+    "server/**.js"
+  ],
   "exclude": ["node_modules"]
 }

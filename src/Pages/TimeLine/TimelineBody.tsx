@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap';
 import styled from 'styled-components';
 
 import { Loader } from '../../Common/DataTransitionHandlers';
-import { currentUser } from '../../Common/helperFns';
+// import { currentUser } from '../../Common/helperFns';
 // import ProfileIcon from '../../Common/ProfileIcon';
 import TimelinePostCard from '../../Common/TimelinePostCard';
 
@@ -67,9 +67,7 @@ const StyledTimelineBody = styled.div`
 `;
 
 function TimelineBody(): React.ReactElement {
-  const { isFetching, isSuccess, data } = useGetTimeLineImgsQuery(
-    currentUser()
-  );
+  const { isLoading, isSuccess, data } = useGetTimeLineImgsQuery(undefined);
   const [updateLikeCountFn] = useUpdateLikeCountMutation();
   const [updateCommentFn] = useUpdateCommentMutation();
   // const [friendReqtTrigger] = useFriendRequestMutation();
@@ -92,9 +90,8 @@ function TimelineBody(): React.ReactElement {
     flag: UpdateLikeReqBody['likedFlag']
   ) => {
     const reqBody = {
-      postName: imgDetail.image,
-      postedBy: imgDetail.userName,
       likedFlag: flag,
+      postId: imgDetail._id,
       imgDetail,
     };
     updateLikeCountFn(reqBody).unwrap();
@@ -114,8 +111,7 @@ function TimelineBody(): React.ReactElement {
       newCommentInImgs.find(({ id }) => imgDetail._id === id) || {};
     if (comment) {
       const reqBody = {
-        postName: imgDetail.image,
-        postedBy: imgDetail.userName,
+        postId: imgDetail._id,
         comment,
         imgDetail,
         onCacheUpdate: () => {
@@ -167,7 +163,7 @@ function TimelineBody(): React.ReactElement {
   }; */
 
   const getTimelineContent = () => {
-    if (isFetching) {
+    if (isLoading) {
       return (
         <Loader
           className="loader-element caveatBold"
@@ -188,8 +184,9 @@ function TimelineBody(): React.ReactElement {
               cardClassName={`${index === data.length - 1 ? '' : 'mb-4'}`}
               imagePostedBy={image.userName}
               imagePostedOn={image.postedDate}
+              profileDp={image.userPhoto}
               imgcaption={image.caption}
-              imgSrc={image.imageLink}
+              imgSrc={image.image}
               commentType="normal"
               didCurrentUserLiked={didCurrentUserLiked(image.likedBy)}
               updateLikeCount={(flag) => updateLikeCount(image, flag)}
@@ -387,7 +384,7 @@ function TimelineBody(): React.ReactElement {
     <StyledTimelineBody>
       <Container
         className={`timeline-body-container ${
-          isFetching || isSuccess ? 'frnd-list-view' : ''
+          isLoading || isSuccess ? 'frnd-list-view' : ''
         }`}
       >
         {getTimelineContent()}

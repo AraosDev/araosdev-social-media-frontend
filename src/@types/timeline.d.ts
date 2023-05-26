@@ -11,6 +11,7 @@ interface TimelineImages {
     commentedOn: number;
     userName: string;
   }>;
+  userPhoto: string;
 }
 interface TimeLineImgApiRes {
   timelineImages: TimelineImages[];
@@ -18,13 +19,11 @@ interface TimeLineImgApiRes {
 }
 
 interface TransformedTimelineImgRes extends TimelineImages {
-  imageLink: string;
   postedDate: string;
   imageName: string;
 }
 
 interface PostTimelineImgPayload {
-  userName: TimelineImages['userName'];
   file: File;
   caption: string;
 }
@@ -35,9 +34,8 @@ interface PostTimelineImgRes {
 
 interface UpdateLikeReqBody {
   likedFlag: 'INCREMENT' | 'DECREMENT';
-  postName: string;
-  postedBy: TimelineImages['userName'];
   imgDetail: TransformedTimelineImgRes;
+  postId: TimelineImages['_id'];
 }
 
 interface UpdateCommentReqBody extends Omit<UpdateLikeReqBody, 'likedFlag'> {
@@ -85,6 +83,7 @@ interface TimelinePostCardProps {
   newCommentChangeHandler?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   postNewCommentHandler?: (e: React.MouseEvent<HTMLElement>) => void;
   noImgAvailableText?: string;
+  profileDp?: string;
 }
 
 type TimelineStates = 'TIMELINE_VIEW' | 'FRIEND_LIST_VIEW' | 'MESSAGE_VIEW';

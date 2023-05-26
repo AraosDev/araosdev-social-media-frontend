@@ -58,6 +58,7 @@ interface ProfileIconProps {
   iconSize?: string;
   iconTextColor?: string;
   iconText?: string;
+  profileDp?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 

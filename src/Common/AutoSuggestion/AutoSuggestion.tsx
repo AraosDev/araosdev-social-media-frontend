@@ -70,10 +70,10 @@ function AutoSuggestion({
 
   const getSuggestionsLists = () => {
     if (Array.isArray(filteredSuggestion) && filteredSuggestion.length) {
-      return filteredSuggestion.map(({ value, valueId }, index) =>
+      return filteredSuggestion.map(({ value, valueId, ...rest }, index) =>
         customListComponent ? (
           customListComponent(
-            { valueId, value },
+            { valueId, value, ...rest },
             onHoverList,
             `${
               activeValueId === index && 'list-item-active'
