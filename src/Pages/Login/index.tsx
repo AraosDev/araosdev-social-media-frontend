@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
 import './index.css';
@@ -7,6 +8,7 @@ import './index.css';
 import { LoginAccountConstants } from 'Common/AppLabels/LoginPageLabels';
 import { useLoggedInUserInfoMutation } from 'Store/apiSlices/mainAPISlice';
 import { getLoggedInUserInfo } from 'Store/mutationTriggers/loginTriggers';
+import { setTimelineState } from 'Store/reducer/timelineReducer';
 
 const {
   HEADER_1,
@@ -23,6 +25,7 @@ const {
 
 function Login(): React.ReactElement {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [loggedInUserInfo] = useLoggedInUserInfoMutation();
 
   const [userName, setUserName] = useState('');
@@ -33,8 +36,10 @@ function Login(): React.ReactElement {
       loggedInUserInfo,
       { userDetail: userName, password },
       (state) => {
-        if (state === 'SUCCESS') navigate('/timeline', { replace: true });
-        else if (state === 'ERROR') alert('Login Failed !!');
+        if (state === 'SUCCESS') {
+          dispatch(setTimelineState('TIMELINE_VIEW'));
+          navigate('/timeline', { replace: true });
+        } else if (state === 'ERROR') alert('Login Failed !!');
       }
     );
   };

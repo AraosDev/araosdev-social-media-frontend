@@ -8,11 +8,11 @@ interface TimelineReducerInitialState {
 const { pathname } = window.location;
 
 export const initialState: TimelineReducerInitialState = {
-  timelineState: pathname.includes('timeline')
-    ? 'TIMELINE_VIEW'
+  timelineState: pathname.includes('messages')
+    ? 'MESSAGE_VIEW'
     : pathname.includes('account-settings')
     ? 'ACCOUNT_VIEW'
-    : 'MESSAGE_VIEW',
+    : 'TIMELINE_VIEW',
   createAccountState: 'CREATE_ACCOUNT',
 };
 

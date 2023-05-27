@@ -392,6 +392,7 @@ function TimeLineHeader(): React.ReactElement {
               logout(null).then((res) => {
                 if (res.data?.status === 'SUCCESS') {
                   localStorage.clear();
+                  switchViews('TIMELINE_VIEW');
                   navigate('/', { replace: true });
                 }
               });

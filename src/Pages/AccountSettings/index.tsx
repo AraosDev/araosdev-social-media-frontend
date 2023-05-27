@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 
 import GeneralSettings from './GeneralSettings';
+import ManageFriends from './ManageFriends';
 import SettingsSideBar from './SettingsSideBar';
 
 import TimeLineHeader from 'Pages/TimeLine/Header';
@@ -15,6 +16,8 @@ function AccountSettings() {
     switch (currentSetting) {
       case 'general-settings':
         return <GeneralSettings />;
+      case 'friends':
+        return <ManageFriends />;
       default:
         return null;
     }

@@ -13,3 +13,7 @@ interface UpdateUserInfoApiRes {
 }
 
 type GeneralSettingUpdateState = 'LOADING' | 'LOADED' | 'ERROR';
+
+interface RenderFriendListProps {
+  viewType: 'FRIENDS' | 'FRIENDREQUESTS' | 'FRIENDREQUESTSENT';
+}
