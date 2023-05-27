@@ -44,6 +44,10 @@ export const StyledManageFriends = styled(Container)`
   }
 `;
 
+export const StyledUpdatePwd = styled(Container)`
+  width: 100%;
+`;
+
 export const StyledSettingsSidebar = styled.div`
   height: 83vh;
   .list-group {

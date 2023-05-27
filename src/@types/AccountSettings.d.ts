@@ -12,6 +12,18 @@ interface UpdateUserInfoApiRes {
   user: UserInfo;
 }
 
+interface UpdateUserPwdApiRes {
+  status: string;
+  message: string;
+  token: string;
+}
+
+interface UpdateUserPwdApiReq {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 type GeneralSettingUpdateState = 'LOADING' | 'LOADED' | 'ERROR';
 
 interface RenderFriendListProps {

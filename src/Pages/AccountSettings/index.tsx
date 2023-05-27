@@ -4,7 +4,9 @@ import { Col, Container, Row } from 'react-bootstrap';
 
 import GeneralSettings from './GeneralSettings';
 import ManageFriends from './ManageFriends';
+import Preferences from './Preferences';
 import SettingsSideBar from './SettingsSideBar';
+import UpdatePwd from './UpdatePwd';
 
 import TimeLineHeader from 'Pages/TimeLine/Header';
 
@@ -18,8 +20,10 @@ function AccountSettings() {
         return <GeneralSettings />;
       case 'friends':
         return <ManageFriends />;
+      case 'change-password':
+        return <UpdatePwd />;
       default:
-        return null;
+        return <Preferences />;
     }
   };
 
