@@ -363,23 +363,30 @@ function TimeLineHeader(): React.ReactElement {
           style={{ top: 60, right: 50 }}
         >
           {timelineState !== 'TIMELINE_VIEW' ? (
-            <Dropdown.Item onClick={() => switchViews('TIMELINE_VIEW')}>
+            <Dropdown.Item
+              onClick={() => {
+                switchViews('TIMELINE_VIEW');
+                navigate('/timeline');
+              }}
+            >
               My Timeline
             </Dropdown.Item>
           ) : null}
-          {/* {timelineState !== 'FRIEND_LIST_VIEW' ? (
-            <Dropdown.Item onClick={() => switchViews('FRIEND_LIST_VIEW')}>
-              My Friends
-            </Dropdown.Item>
-          ) : null} */}
-          {timelineState !== 'MESSAGE_VIEW' ? (
+          {/* {timelineState !== 'MESSAGE_VIEW' ? (
             <Dropdown.Item onClick={() => switchViews('MESSAGE_VIEW')}>
               Messages
             </Dropdown.Item>
+          ) : null} */}
+          {timelineState !== 'ACCOUNT_VIEW' ? (
+            <Dropdown.Item
+              onClick={() => {
+                switchViews('ACCOUNT_VIEW');
+                navigate('/account-settings');
+              }}
+            >
+              Account Settings
+            </Dropdown.Item>
           ) : null}
-          <Dropdown.Item onClick={() => navigate('/account-settings')}>
-            Account Settings
-          </Dropdown.Item>
           <Dropdown.Item
             onClick={() => {
               logout(null).then((res) => {

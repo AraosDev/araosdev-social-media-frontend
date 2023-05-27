@@ -173,7 +173,7 @@ function TimelineBody(): React.ReactElement {
     }
     if (
       isSuccess &&
-      timelineState !== 'FRIEND_LIST_VIEW' &&
+      timelineState !== 'ACCOUNT_VIEW' &&
       timelineState !== 'MESSAGE_VIEW'
     ) {
       return (
