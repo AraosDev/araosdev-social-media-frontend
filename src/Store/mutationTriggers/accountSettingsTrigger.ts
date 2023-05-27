@@ -39,4 +39,40 @@ const updateAccountInfoTrigger = (
     .catch(() => captureTriggerStatus('ERROR'));
 };
 
+export const updateAccountPwdTrigger = (
+  trigger: MutationTrigger<
+    MutationDefinition<
+      UpdateUserPwdApiReq,
+      BaseQueryFn<
+        string | FetchArgs,
+        unknown,
+        FetchBaseQueryError,
+        object,
+        FetchBaseQueryMeta
+      >,
+      'UPDATE_TIMELINE',
+      UpdateUserPwdApiRes,
+      'adsmMainReducer'
+    >
+  >,
+  reqBody: UpdateUserPwdApiReq,
+  captureTriggerStatus: (
+    state: GeneralSettingUpdateState,
+    message?: string
+  ) => void
+) => {
+  captureTriggerStatus('LOADING');
+  trigger(reqBody)
+    .unwrap()
+    .then((res) => {
+      if (
+        res.status === 'SUCCESS' &&
+        res.message === 'Password updated successfully.'
+      )
+        captureTriggerStatus('LOADED', res.message);
+      else captureTriggerStatus('ERROR', 'Unknown error occurred');
+    })
+    .catch((e) => captureTriggerStatus('ERROR', e.message));
+};
+
 export default updateAccountInfoTrigger;

@@ -86,4 +86,4 @@ interface TimelinePostCardProps {
   profileDp?: string;
 }
 
-type TimelineStates = 'TIMELINE_VIEW' | 'FRIEND_LIST_VIEW' | 'MESSAGE_VIEW';
+type TimelineStates = 'TIMELINE_VIEW' | 'ACCOUNT_VIEW' | 'MESSAGE_VIEW';

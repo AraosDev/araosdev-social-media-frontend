@@ -5,8 +5,14 @@ interface TimelineReducerInitialState {
   createAccountState: CreateAccountStates;
 }
 
+const { pathname } = window.location;
+
 export const initialState: TimelineReducerInitialState = {
-  timelineState: 'TIMELINE_VIEW',
+  timelineState: pathname.includes('messages')
+    ? 'MESSAGE_VIEW'
+    : pathname.includes('account-settings')
+    ? 'ACCOUNT_VIEW'
+    : 'TIMELINE_VIEW',
   createAccountState: 'CREATE_ACCOUNT',
 };
 

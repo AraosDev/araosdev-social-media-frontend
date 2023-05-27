@@ -87,6 +87,26 @@ export const adsmApiSlice = createApi({
         headers: { Authorization: `Bearer ${getCurrentToken()}` },
       }),
     }),
+    // Updating the current user's password
+    updateCurrentUserPassword: builder.mutation<
+      UpdateUserPwdApiRes,
+      UpdateUserPwdApiReq
+    >({
+      query: (userPwdPayload) => ({
+        url: 'AUTHNZ/updatePassword/me',
+        method: 'PATCH',
+        body: userPwdPayload,
+        headers: { Authorization: `Bearer ${getCurrentToken()}` },
+        credentials: 'include',
+      }),
+      transformResponse: (res: UpdateUserPwdApiRes) => {
+        const oldUserInfo = JSON.parse(localStorage.getItem('userInfo') || '');
+        const newUserInfo = { ...oldUserInfo, token: res.token };
+        localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+
+        return res;
+      },
+    }),
     // Getting timeline image APIs
     getTimeLineImgs: builder.query<TransformedTimelineImgRes[], undefined>({
       query: () => {
@@ -330,6 +350,7 @@ export const {
   useLazyForgotPasswordQuery,
   useResetPasswordMutation,
   useUpdateCurrentUserInfoMutation,
+  useUpdateCurrentUserPasswordMutation,
   useCreateAccountMutation,
   usePostTimelineImgMutation,
   useUpdateLikeCountMutation,
