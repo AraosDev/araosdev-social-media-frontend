@@ -1,5 +1,9 @@
 /* eslint-disable no-underscore-dangle */
-import { currentUser, unixTimeToReadableFormat } from '../../Common/helperFns';
+import {
+  currentUser,
+  currentUserInfo,
+  unixTimeToReadableFormat,
+} from '../../Common/helperFns';
 
 export const transformTimeLineResponse = (
   timelineRes: TimeLineImgApiRes
@@ -55,11 +59,14 @@ export const updateLikeCountTransformer = (
         ? [
             ...affectedPost.likedBy,
             {
-              user: currentUser(),
+              userName: currentUser(),
               likedOn: Math.round(new Date().getTime() / 1000),
+              userPhoto: currentUserInfo().photo || '',
             },
           ]
-        : affectedPost.likedBy.filter(({ user }) => user !== currentUser());
+        : affectedPost.likedBy.filter(
+            ({ userName }) => userName !== currentUser()
+          );
     const updateAffectedPost = {
       ...affectedPost,
       likes,
@@ -92,6 +99,7 @@ export const updateCommentTransformer = (
           comment,
           commentedOn: Math.round(new Date().getTime() / 1000),
           userName: currentUser(),
+          userPhoto: currentUserInfo().photo || '',
         },
       ],
     };

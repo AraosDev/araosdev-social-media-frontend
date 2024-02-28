@@ -6,9 +6,10 @@ import {
 } from '../../Common/helperFns';
 
 export const didCurrentUserLiked = (
-  likedByArr: { user: string; likedOn: string | number }[]
+  likedByArr: { userName: string; likedOn: string | number }[]
 ) => {
-  if (likedByArr.some(({ user }) => user === currentUser())) return true;
+  if (likedByArr.some(({ userName }) => userName === currentUser()))
+    return true;
   return false;
 };
 

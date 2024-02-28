@@ -4,12 +4,13 @@ interface TimelineImages {
   image: string;
   postedOn: number;
   likes: string;
-  likedBy: Array<{ user: string; likedOn: number }>;
+  likedBy: Array<{ userName: string; likedOn: number; userPhoto: string }>;
   caption: string;
   commentSection: Array<{
     comment: string;
     commentedOn: number;
     userName: string;
+    userPhoto: string;
   }>;
   userPhoto: string;
 }

@@ -98,6 +98,7 @@ function TimelinePostCard({
                 <ProfileIcon
                   iconText={comment.userName.charAt(0).toUpperCase()}
                   iconSize="28px"
+                  profileDp={comment.userPhoto}
                 />
                 <span
                   className="ms-2 d-flex justify-content-between"
